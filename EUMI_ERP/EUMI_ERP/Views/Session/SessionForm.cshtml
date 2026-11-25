@@ -1,0 +1,1213 @@
+﻿@{
+    ViewBag.Title = "SessionForm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="~/ProjectScript/Windowsprint.js"></script>
+<script type="text/javascript" src="~/ProjectScript/CommonHMS.js"></script>
+<script src="~/Scripts/Autocomplete/jquery-ui.js"></script>
+
+<style>
+    .label-control {
+        font-weight: bold;
+    }
+
+    .p-1 {
+        padding-top: .1rem !important;
+        padding-bottom: .1rem !important;
+    }
+
+    select.form-control:not([size]):not([multiple]) {
+        height: calc(2.25rem + 4px);
+    }
+
+    .jsgrid-table {
+        width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        border-spacing: 0;
+        background-color: #ffffff;
+    }
+
+    .jsgrid-header-row {
+        background-color: #14989b;
+        color: white;
+        font-weight: 600;
+    }
+
+    .jsgrid-header-cell {
+        padding: 10px;
+        border-right: 1px solid #2ec4c6;
+        text-align: center;
+    }
+
+    .jsgrid-header-row th:last-child {
+        border-right: none;
+    }
+
+    .jsgrid-cell {
+        border: 1px solid #e6e6e6;
+        height: 38px;
+        background-color: #ffffff;
+    }
+
+        .jsgrid-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+        }
+
+            .jsgrid-cell input:focus {
+                outline: none;
+                background-color: #fff;
+                border: 1px solid #66afe9;
+                box-shadow: inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6);
+            }
+
+    .delete-row {
+        background: none;
+        border: none;
+        color: #dc3545;
+        font-size: 1.2rem;
+        cursor: pointer;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .delete-row:hover {
+            color: #c82333;
+        }
+
+    .white-bg {
+        background-color: #fff;
+        padding: 15px;
+        border-radius: 0 0 4px 4px;
+    }
+
+    .button-row {
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .patient-bg {
+        background-color: #E0F3F4;
+        padding: 12px 15px;
+    }
+
+    hr {
+        margin: 0;
+        border-top: 2px solid #ddd;
+    }
+
+    /* Success modal */
+    .custom-modal {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.4);
+    }
+
+    .custom-modal-content {
+        background-color: #f2f2f2;
+        margin: 10% auto;
+        padding: 40px 20px;
+        width: 500px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .check-circle {
+        width: 100px;
+        height: 100px;
+        border: 6px solid #cfe6cf;
+        border-radius: 50%;
+        margin: 0 auto 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .check-circle i {
+            color: #8bc34a;
+            font-size: 50px;
+        }
+
+    .custom-modal-content h2 {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 30px;
+    }
+
+    .ok-btn {
+        background-color: #7fc0df;
+        color: white;
+        border: none;
+        padding: 10px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+        .ok-btn:hover {
+            background-color: #5ba9d6;
+        }
+
+    .btn-teal {
+        background-color: #159a9c;
+        color: white;
+        border: none;
+    }
+
+        .btn-teal:hover {
+            background-color: #117e80;
+            color: white;
+        }
+
+    #ProcedureName0 {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    /* Autocomplete dropdown fix */
+    .ui-autocomplete {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+   
+
+</style>
+
+
+
+
+
+<div id="Entry">
+    <section class="grid-row-label">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+
+                    <!-- Card Header -->
+                    <div class="card-header"
+                         style="border-bottom:1px solid #e6e6e6;background-color:#009DA0;height:70px">
+                        <table width="100%">
+                            <tr>
+                                <td>
+                                    <h2 class="card-title mb-0"
+                                        style="font-weight:bold;font-size:x-large;color:white;">
+                                        SESSION TREATMENT FORM
+                                    </h2>
+                                </td>
+                                <td class="text-right" width="59%">
+                                    <i class="ft-calendar"
+                                       style="font-weight:normal;font-size:x-large;color:white"></i>
+                                    <input type="text" id="BillDate"
+                                           style="border:none;background-color:#009DA0;color:white;
+                                                  font-weight:normal;font-size:x-large;"
+                                           class="disb" disabled>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <div class="card-content collapse show">
+                        <div class="card-body" style="padding:0 !important;">
+                            <form action="#" autocomplete="off">
+                                <div class="form-body">
+
+                                    <!-- Patient Info Band -->
+                                    <div class="patient-bg">
+
+                                        <!-- Row 1: Reg No / Patient / Age/Sex -->
+                                        <div class="row p-1">
+                                            <div class="col-md-1">
+                                                <label class="label-control">Reg No</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <table width="100%">
+                                                    <tr>
+                                                        <td width="30%">
+                                                            <input type="text" id="Opseriesname"
+                                                                   readonly class="form-control atcm">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" id="RegNo"
+                                                                   class="form-control atcm"
+                                                                   onfocus="LoadRegNumber()"
+                                                                   placeholder="Type to search...">
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                            <div class="col-md-1 text-right">
+                                                <label class="label-control">Patient</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" id="Name"
+                                                       class="form-control patdet">
+                                            </div>
+                                            <div class="col-md-1 text-right">
+                                                <label class="label-control">Age/Sex</label>
+                                            </div>
+                                            <div class="col-md-3 input-group m-0">
+                                                <input type="text" id="Age"
+                                                       class="form-control patdet">
+                                                <select id="Gender" class="form-control">
+                                                    <option value="0">Select</option>
+                                                    <option value="1">Male</option>
+                                                    <option value="2">Female</option>
+                                                    <option value="3">Others</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Row 2: Doctor / Contact / OP/IP# -->
+                                        <div class="row p-1">
+                                            <div class="col-md-1">
+                                                <label class="label-control">Doctor</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <select id="Doctor" class="form-control patdet"></select>
+                                            </div>
+                                            <div class="col-md-1 text-right">
+                                                <label class="label-control">Contact</label>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <input type="text" id="Contact"
+                                                       class="form-control patdet rdonl">
+                                            </div>
+                                            <div class="col-md-1 text-right">
+                                                <label class="label-control">OP/IP#</label>
+                                            </div>
+                                            <div class="col-md-3 input-group m-0">
+                                                <input type="text" id="OpNo"
+                                                       class="form-control rdonl patdet">
+                                                <input type="text" id="IpNo"
+                                                       class="form-control rdonl patdet">
+                                            </div>
+                                        </div>
+
+                                    </div><!-- /patient-bg -->
+
+                                    <hr style="margin-top:3px" />
+
+                                    <!-- White area: procedure + grid + buttons -->
+                                    <div class="white-bg">
+
+                                        <!-- Procedure search row -->
+                                        <div class="row p-1 align-items-center">
+                                            <div class="col-md-1">
+                                                <label class="label-control">
+                                                    Procedure<span class="danger">*</span>
+                                                </label>
+                                            </div>
+                                            <div class="col-md-4">
+                                               
+                   
+                                                <input type="text" id="ProcedureName0"
+                                                       class="form-control atcm"
+                                                       onfocus="LoadProcedureSearch()"
+                                                       placeholder="Type procedure name...">
+                                                <input type="hidden" id="ProcedureId0">
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <button type="button" id="btnAddDay"
+                                                        class="btn btn-outline-primary"
+                                                        style="font-weight:bold;width:120px"
+                                                        onclick="AddDay()">
+                                                    + Add Day
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Session Days Grid -->
+                                        <div style="margin-top:10px;">
+                                            <div id="customView" class="jsgrid"
+                                                 style="position:relative;height:277px;width:100%;
+                                                        border:solid 1px #e9e9e9;
+                                                        overflow-x:auto;overflow-y:hidden;">
+
+                                                <!-- Fixed header -->
+                                                <div class="jsgrid-grid-header" style="width:100%;">
+                                                    <table class="jsgrid-table">
+                                                        <colgroup>
+                                                            <col style="width:5%">
+                                                            <col style="width:5%">
+                                                            <col style="width:13%">
+                                                            <col style="width:10%">
+                                                            <col style="width:14%">
+                                                            <col style="width:20%">
+                                                            <col style="width:33%">
+                                                        </colgroup>
+                                                        <thead>
+                                                            <tr class="jsgrid-header-row">
+                                                                <th class="jsgrid-header-cell">
+                                                                    <i class="icon-trash"></i>
+                                                                </th>
+                                                                <th class="jsgrid-header-cell">SL#</th>
+                                                                <th class="jsgrid-header-cell">Date</th>
+                                                                <th class="jsgrid-header-cell">Hours</th>
+                                                                <th class="jsgrid-header-cell">Room</th>
+                                                                <th class="jsgrid-header-cell">
+                                                                    Therapist/Consultant
+                                                                </th>
+                                                                <th class="jsgrid-header-cell">Notes</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>
+
+                                                <!-- Scrollable body -->
+                                                <div id="sessiondaysdiv"
+                                                     style="position:relative;overflow-x:auto;
+                                                            overflow-y:scroll;height:233px;width:100%;
+                                                            border-bottom:1px solid #e9e9e9;">
+                                                    <table class="jsgrid-table" id="TblSessionDays">
+                                                        <colgroup>
+                                                            <col style="width:5%">
+                                                            <col style="width:5%">
+                                                            <col style="width:13%">
+                                                            <col style="width:10%">
+                                                            <col style="width:14%">
+                                                            <col style="width:20%">
+                                                            <col style="width:33%">
+                                                        </colgroup>
+                                                        <tbody id="dayRows"></tbody>
+                                                    </table>
+                                                </div>
+
+                                            </div>
+                                        </div><!-- /grid -->
+                                        <!-- Action buttons -->
+                                        <div class="button-row">
+                                            <button type="button" id="btnsave" onclick="SaveAndUpdate()" class="btn btn-primary" style="width:120px">
+                                                Save <i class="fa fa-check-square-o"></i>
+                                            </button>
+
+                                            <button type="button" id="btnview" onclick="GetRows()" class="btn btn-primary" style="width:120px">
+                                                View <i class="ft-eye"></i>
+                                            </button>
+
+                                            <button type="button" onclick="formrefreshconfirm()" class="btn btn-primary" style="width:120px">
+                                                Clear <i class="ft-refresh-cw"></i>
+                                            </button>
+                                        </div>
+
+                                    </div><!-- /white-bg -->
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<div class="container">
+    <div class="modal fade" id="myModalSession" role="dialog">
+        <div class="modal-dialog" style="max-width:95%; width:1400px;">
+            <div class="modal-content">
+                <div class="modal-header bg-primary white">
+                    <div class="row col-md-12 p-0">
+                        <div class="col-md-6">
+                            <h4 class="modal-title font-weight-bold">SESSION TREATMENTS</h4>
+                        </div>
+                        <div class="col-md-5"></div>
+                        <div class="col-md-1 p-0">
+                            <button type="button" class="close pull-right" onclick="$('#myModalSession').modal('hide')">&times;</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div style="display:flex; gap:10px; align-items:center; margin-bottom:15px;">
+                        <input type="text" id="SessionDateFrom" class="form-control" style="height:38px;width:160px;">
+                        <span>-</span>
+                        <input type="text" id="SessionDateTo" class="form-control" style="height:38px;width:160px;">
+                        <button type="button" class="btn btn-warning" onclick="CallSessionViewList()" style="height:38px;">GO</button>
+
+                        <input type="text" id="SessionSearch" class="form-control"
+                               style="height:38px;width:250px;margin-left:10px;"
+                               placeholder="Search patient, phone, procedure..."
+                               oninput="FilterSessionList()">
+                    </div>
+                    <div style="max-height:500px; overflow-y:auto; overflow-x:auto;">
+                        <table id="tblSessionViewList" width="100%" class="table table-striped table-bordered base-style dataTable"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hidden fields -->
+<div style="display:none">
+    <input type="text" id="RegSeries" class="form-control patdet">
+    <input type="text" id="Genderhid" class="form-control rdonl patdet">
+    <input type="text" id="TreatmentId" value="0">
+</div>
+
+<script type="text/javascript">
+
+    var Count = 0;
+    var PRID = 0;
+
+    // ─────────────────────────────────────────────────────────
+    // Document Ready
+    // ─────────────────────────────────────────────────────────
+    $(document).ready(function () {
+        $('.form-control').attr('autocomplete', 'off');
+        $('.rdonl').attr('readonly', true).css('background-color', 'white');
+
+        // Force clear all fields on page load (prevents browser autocache restore)
+        $('input[type="text"]').not('.disb').val('');
+        $('select').val(0);
+        $('#TreatmentId').val(0);
+        $('#dayRows').empty();
+        Count = 0;
+        PRID = 0;
+
+        // Set today's date in header
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        $('#BillDate').val(dd + '/' + mm + '/' + yyyy);
+
+        LoadDoctors();
+        $('#RegNo').focus();
+        document.title = "SessionForm";
+    });
+
+    
+
+    // ─────────────────────────────────────────────────────────
+    // Load Doctors dropdown
+    // ─────────────────────────────────────────────────────────
+    function LoadDoctors() {
+        $.ajax({
+            type: "POST",
+            url: "../Revisit/HMS_RevistDoctorGets",
+            data: { DoctorId: 0, DeptId: ERPDeptId },
+            success: function (result) {
+                if (result.oList && result.oList.length > 0) {
+                    $("#Doctor").empty().append("<option value='0'>Select</option>");
+                    $.each(result.oList, function (i, item) {
+                        $("#Doctor").append(
+                            "<option value='" + item.DoctorId + "'>"
+                            + item.DoctorName + "</option>"
+                        );
+                    });
+                }
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Patient Reg No Autocomplete
+    // ─────────────────────────────────────────────────────────
+    function LoadRegNumber() {
+        $("#RegNo").autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: function (request, response) {
+                ClearPatientData();
+                var data = {};
+                data.PatientName = $("#RegNo").val();
+                data.DeptId = ERPDeptId;
+                $.ajax({
+                    url: '../Revisit/HMS_IPorPatientSearch',
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            const MR = (item.Add1 || '').split("##");
+                            return ({
+                                ColCount: '3RR',
+                                label: item.OPSerName + ' - ' + item.OPNumber,
+                                label1: item.PatientName,
+                                label2: item.AadharNo,
+                                label3: MR[0],
+                                label4: MR[3],
+                                PatientId: item.PatientId,
+                                DOB: item.DOB,
+                                Contact: item.Contact,
+                                OPNumber: item.OPNumber,
+                                PatientName: item.PatientName,
+                                IpNo: item.AadharNo,
+                                IPYear: item.Status,
+                                Regsername: item.OPSerName,
+                                OPSerId: item.OPSerId || 0,
+                                headers: ["RegNo", "Patient", "IP No", "Address", "Mobile"]
+                            });
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                $('#IpNo').val(ui.item.IpNo);
+                $('#Opseriesname').val(ui.item.Regsername);
+                $('#RegNo').val(ui.item.OPNumber);
+                $('#Name').val(ui.item.PatientName);
+                $('#Contact').val(ui.item.Contact);
+                $('#RegSeries').val(ui.item.OPSerId || 0);
+                PRID = ui.item.PatientId;
+                GetLastRevisitDetails(ui.item.PatientId);
+                $('#ProcedureName0').focus().select();
+            }
+        }).on('keydown', function (e) {
+            if (e.which == 13 && $('#RegNo').val() !== '') {
+                $('#ProcedureName0').focus();
+            }
+        });
+    }
+
+    function GetLastRevisitDetails(PatientId) {
+        $.ajax({
+            type: "POST",
+            url: "../Revisit/HMS_LAstRevisitGetsOP",
+            data: { PatientId: PatientId, DeptId: ERPDeptId },
+            success: function (result) {
+                if (result.oList && result.oList.length > 0) {
+                    var p = result.oList[0];
+                    var age = AgeCalculation(p.DOB);
+                    $('#Age').val(age.years > 1
+                        ? age.years + ' Years' : age.years + ' Year');
+                    $('#Gender, #Genderhid').val(p.Flag);
+                    $('#Doctor').val(p.DoctorId);
+                    $('#OpNo').val(p.RevisitId);
+                    $('#RegSeries').val(p.OPSerId);
+                    $('#Contact').val(p.Contact);
+                }
+            }
+        });
+    }
+
+    function ClearPatientData() {
+        $('.patdet').val('');
+        $('#Doctor, #Gender, #Genderhid').val(0);
+        $('#TreatmentId').val(0);
+        $('#dayRows').empty();
+        Count = 0;
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Procedure Autocomplete  (HMS two-column dropdown style)
+    // ─────────────────────────────────────────────────────────
+    function LoadProcedureSearch() {
+        $("#ProcedureName0").autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: function (request, response) {
+                $('#ProcedureId0').val('');          // clear on each search
+                var data = {};
+                data.ProcedureName = $("#ProcedureName0").val();
+                data.ProcedureId = 0;
+                $.ajax({
+                    url: '../Session/HMS_ProcedureSearch',  // ← SessionController
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return ({
+                                ColCount: 'TWOEnq',
+                                label: item.ProcedureCode,
+                                label1: item.ProcedureName,
+                                value: item.ProcedureCode,
+                                value1: item.ProcedureName,
+                                "Procedure Code": item.ProcedureCode,
+                                "Procedure Name": item.ProcedureName,
+                                ProcedureId: item.ProcedureId,
+                                Rate: item.Procedurecharge,
+                                ProcedureName: item.ProcedureName,
+                                headers: ["Procedure Code", "Procedure Name"]
+                            });
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+               
+
+                $("#ProcedureName0").val(ui.item.ProcedureName);
+                $("#ProcedureId0").val(ui.item.ProcedureId);
+
+               
+
+                LoadProcedureSessionTemplate(ui.item.ProcedureId);
+                $('#btnAddDay').focus();
+            }
+        }).on('keydown', function (e) {
+            if (e.which == 13 && ($('#ProcedureId0').val() || 0) != 0) {
+                $('#btnAddDay').focus();
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Load template rows when procedure is selected
+    // Calls HMS_SessionTreatmentGetandGets via SessionController
+    // ─────────────────────────────────────────────────────────
+    function LoadProcedureSessionTemplate(procedureId) {
+        var pidInt = parseInt(procedureId, 10);
+        if ($('#dayRows .day-row').length > 0) {
+            $('#dayRows').empty();
+            Count = 0;
+        }
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentEditorGetbyProcedure",
+            data: { ProcedureId: pidInt },
+            success: function (result) {
+                // Capture EditorId so SaveAndUpdate() can link this booking back to its template
+                $('#TreatmentId').val(result.oHeader && result.oHeader.EditorId ? result.oHeader.EditorId : 0);
+
+                // No template saved for this procedure → add one blank row
+                if (!result.oDetailList || result.oDetailList.length === 0) {
+                    AddDayRow(null);
+                    return;
+                }
+                // Sort by SlNo ascending
+                var days = result.oDetailList.slice().sort(function (a, b) {
+                    return (a.SLNo || 0) - (b.SLNo || 0);
+                });
+                // Base date = today from BillDate (dd/MM/yyyy)
+                var billDateStr = $('#BillDate').val();
+                var parts = billDateStr.split('/');
+                var baseDate = new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+                var cumulativeOffset = 0;
+                $.each(days, function (i, day) {
+                    var afterDays = day.AfterDays || 0;
+                    var duration = day.Duration || '';
+                    var notes = day.Notes || '';
+                    if (i === 0) {
+                        cumulativeOffset = afterDays - 1;
+                    } else {
+                        cumulativeOffset += afterDays;
+                    }
+                    var sessionDateObj = new Date(baseDate);
+                    sessionDateObj.setDate(baseDate.getDate() + cumulativeOffset);
+                    var dd = String(sessionDateObj.getDate()).padStart(2, '0');
+                    var mm = String(sessionDateObj.getMonth() + 1).padStart(2, '0');
+                    var yyyy = sessionDateObj.getFullYear();
+                    var dateStr = dd + '/' + mm + '/' + yyyy;
+                    AddDayRow({
+                        DayId: 0,
+                        Date: dateStr,
+                        Duration: duration,
+                        DayOfWeek: '',
+                        Notes: notes
+                    });
+                });
+            },
+            error: function (xhr) {
+                console.error('Template load error:', xhr.responseText);
+                warningshow('Error loading procedure template.', '');
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Add Day button click
+    // ─────────────────────────────────────────────────────────
+    function AddDay() {
+        if ($.trim($('#ProcedureName0').val()) === '') {
+            warningshow('Please Select Procedure', 'ProcedureName0');
+            return;
+        }
+        if (($('#ProcedureId0').val() || 0) == 0) {
+            warningshow('Please Select a Valid Procedure', 'ProcedureName0');
+            return;
+        }
+        AddDayRow(null);
+    }
+
+    
+    function AddDayRow(rowData) {
+        Count++;
+        var id = Count;
+        var slno = $('#dayRows .day-row').length + 1;
+
+        // Default date = today dd/MM/yyyy
+        var today = new Date();
+        var todayStr = String(today.getDate()).padStart(2, '0') + '/' +
+            String(today.getMonth() + 1).padStart(2, '0') + '/' +
+            today.getFullYear();
+
+        var DayId = rowData ? (rowData.DayId || 0) : 0;
+        var DateVal = rowData ? (rowData.Date || todayStr) : todayStr;
+        var Duration = rowData ? (rowData.Duration || '') : '';
+        var Room = rowData ? (rowData.Room || '') : '';
+        var Therapist = rowData ? (rowData.Therapist || '') : '';
+        var Notes = rowData ? (rowData.Notes || '') : '';
+
+        var row =
+            "<tr id='SRow" + id + "' class='jsgrid-row day-row'>" +
+
+            // Delete button
+            "<td class='jsgrid-cell' style='text-align:center;padding:0;'>" +
+            "  <button type='button' class='delete-row'" +
+            "    onclick='RowDelete(" + id + "," + DayId + ")' title='Delete'>" +
+            "    <i class='fa fa-trash'></i>" +
+            "  </button>" +
+            "</td>" +
+
+            // SL#
+            "<td class='jsgrid-cell' style='text-align:center;' id='SLRow" + id + "'>"
+            + slno + "</td>" +
+
+            // Date
+            "<td class='jsgrid-cell' style='padding:0;'>" +
+            "  <input type='text' id='SessionDate" + id + "'" +
+            "    class='session-date' value='" + DateVal + "'" +
+            "    placeholder='DD/MM/YYYY'>" +
+            "  <input type='hidden' id='SessionDayId" + id + "' value='" + DayId + "'>" +
+            "</td>" +
+
+            // Hours
+            "<td class='jsgrid-cell' style='padding:0;'>" +
+            "  <input type='text' id='SessionHours" + id + "'" +
+            "    class='day-duration' value='" + Duration + "'" +
+            "    placeholder='Hours'" +
+            "    onkeypress='return isNumberOnly(event)'>" +
+            "</td>" +
+
+            // Room
+            "<td class='jsgrid-cell' style='padding:0;'>" +
+            "  <input type='text' id='SessionRoom" + id + "'" +
+            "    class='day-room' value='" + Room + "'" +
+            "    placeholder='Room'>" +
+            "</td>" +
+
+            //Therapist/Consultant
+            "<td class='jsgrid-cell' style='padding:0;'>" +
+            "  <input type='text' id='SessionTherapist" + id + "' class='day-therapist'" +
+            "    value='" + Therapist + "' placeholder='Therapist/Consultant' autocomplete='off' />" +
+            "  <input type='hidden' id='SessionTherapistId" + id + "'" +
+            "    value='" + (rowData && rowData.TherapistId ? rowData.TherapistId : 0) + "' />" +
+            "</td>" +
+
+            // Notes
+            "<td class='jsgrid-cell' style='padding:0;'>" +
+            "  <input type='text' id='SessionNotes" + id + "'" +
+            "    class='day-notes' value='" + Notes + "'" +
+            "    placeholder='Notes'>" +
+            "</td>" +
+
+            "</tr>";
+
+        $('#dayRows').append(row);
+        $('#sessiondaysdiv').animate({ scrollTop: 9999 }, 400);
+
+        LoadTherapistSearch(id);   // ← new line, wires autocomplete for this row
+
+        // Wire daterangepicker (matches modal date input style)
+        $('#SessionDate' + id).daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            startDate: DateVal ? moment(DateVal, 'DD/MM/YYYY') : moment(),
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        }).on('apply.daterangepicker', function (ev, picker) {
+            $(this).val(picker.startDate.format('DD/MM/YYYY'));
+        });
+    }
+
+   
+    function RowDelete(id, DayId) {
+        if (!DayId || DayId == 0) {
+            $('#SRow' + id).remove();
+            RenumberRows();
+        } else {
+            $.ajax({
+                type: "POST",
+                url: "../Session/HMS_SessionDayDelete",
+                data: { DayId: DayId, CreatedBy: ERPUserId },
+                success: function (result) {
+                    if (result.oList && result.oList[0].Status == '1') {
+                        $('#SRow' + id).remove();
+                        RenumberRows();
+                    } else {
+                        warningshow('Could not delete this row.', '');
+                    }
+                }
+            });
+        }
+    }
+
+    function RenumberRows() {
+        var n = 1;
+        $('#dayRows .day-row').each(function () {
+            $(this).find('td:eq(1)').text(n++);
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Save
+    // ─────────────────────────────────────────────────────────
+    function SaveAndUpdate() {
+        if (($('#OpNo').val() || 0) == 0) {
+            warningshow('Please select a valid patient', 'RegNo');
+            return;
+        }
+        if ($.trim($('#ProcedureName0').val()) === '') {
+            warningshow('Please Select Procedure', 'ProcedureName0');
+            return;
+        }
+        if (($('#ProcedureId0').val() || 0) == 0) {
+            warningshow('Please Select a Valid Procedure', 'ProcedureName0');
+            return;
+        }
+        if ($('#dayRows .day-row').length === 0) {
+            warningshow('Please add at least one Day', 'btnAddDay');
+            return;
+        }
+
+        var sessionDaysParts = [];
+        $('#dayRows .day-row').each(function () {
+            var rowId = $(this).attr('id').replace('SRow', '');
+            var slno = parseInt($(this).find('td:eq(1)').text());
+            var dateVal = ($('#SessionDate' + rowId).val() || '').replace(/[~|]/g, ' ');
+            var hours = $('#SessionHours' + rowId).val() || 0;
+            var room = ($('#SessionRoom' + rowId).val() || '').replace(/[~|]/g, ' ');
+            var therapist = ($('#SessionTherapist' + rowId).val() || '').replace(/[~|]/g, ' ');
+            var notes = ($('#SessionNotes' + rowId).val() || '').replace(/[~|]/g, ' ');
+            sessionDaysParts.push(slno + '~' + dateVal + '~' + hours + '~' + room + '~' + therapist + '~' + notes);
+        });
+
+        var data = {};
+        data.RegNo = BuildFullRegNo();
+        data.PatientName = $('#Name').val();
+        data.AgeSex = $('#Age').val() + ' / ' + $('#Gender option:selected').text();
+        data.DoctorName = $('#Doctor option:selected').text();
+        data.Contact = $('#Contact').val();
+        data.OPIPNumber = $('#OpNo').val() || $('#IpNo').val();
+        data.ProcedureName = $('#ProcedureName0').val();
+        data.ProcedureId = $('#ProcedureId0').val();
+        data.Age = $('#Age').val();
+        data.Sex = $('#Gender').val();
+        data.ContactNo = $('#Contact').val();
+        data.DoctorId = $('#Doctor').val();
+        data.OPNo = $('#OpNo').val();
+        data.IPNo = $('#IpNo').val();
+        data.EditorId = parseInt($('#TreatmentId').val() || 0);
+        data.CreatedBy = ERPUserId;
+        data.SessionDaysJson = sessionDaysParts.join('|');
+
+        
+
+        $('#btnsave').prop('disabled', true);
+
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentInsertandUpdate",
+            data: data,
+            success: function (result) {
+                $('#btnsave').prop('disabled', false);
+                if (result.success && result.oList && result.oList.length > 0) {
+                    var status = result.oList[0].Status;
+                    if (status == '1') {
+                        swal('Data Saved Successfully', '', 'success')
+                            .then(function () {
+                                formrefresh();
+                            });
+                        $('.swal-button--confirm').focus();
+                    } else {
+                       
+                        $('.swal-button--confirm').focus();
+                    }
+                } else {
+                    warningshow('Save failed: ' + (result.errorMsg || 'Unknown error'), '');
+                }
+            },
+            error: function () {
+                $('#btnsave').prop('disabled', false);
+                warningshow('Error saving record.', '');
+            }
+        });
+    }
+
+    function formrefreshconfirm() {
+        if ($('#dayRows .day-row').length > 0) {
+            swal({
+                title: 'Clear Form?',
+                text: 'Data will be lost. Do you want to continue?',
+                icon: 'warning',
+                buttons: {
+                    cancel: { text: 'Cancel', value: null, visible: true },
+                    confirm: { text: 'Yes, Clear', value: true, className: 'btn-danger' }
+                }
+            }).then(function (value) {
+                if (value) {
+                    formrefresh();
+                }
+            });
+        } else {
+            formrefresh();
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // View button → open modal, set up date range, load list
+    // ─────────────────────────────────────────────────────────
+    function GetRows() {
+        var today = new Date();
+        var dd = String(today.getDate()).padStart(2, '0');
+        var mm = String(today.getMonth() + 1).padStart(2, '0');
+        var yyyy = today.getFullYear();
+        var todayStr = dd + '/' + mm + '/' + yyyy;
+
+        $('#SessionDateFrom').val(todayStr);
+        $('#SessionDateTo').val(todayStr);
+
+        LoadSessionDateRange();   // ← add this line
+
+        $('#myModalSession').modal('show');
+        $('#myModalSession').appendTo('body');
+
+        CallSessionViewList();
+    }
+
+    function CallSessionViewList() {
+        var data = {};
+        data.DateFrom = $('#SessionDateFrom').val();
+        data.DateTo = $('#SessionDateTo').val();
+
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentListView",
+            data: data,
+            success: function (result) {
+                GetSessionViewList(result.oList);
+            },
+            error: function (xhr) {
+                console.error('ListView error:', xhr.status, xhr.responseText);
+                warningshow('Error loading session list. Check console.', '');
+            }
+        });
+    }
+
+    function GetSessionViewList(result) {
+        $('#tblSessionViewList tr').remove();
+
+        var head = "<thead><tr>" +
+            "<th style='width:60px'></th>" +
+            "<th style='width:110px'>Reg No</th>" +
+            "<th style='width:200px'>Patient Name</th>" +
+            "<th style='width:250px'>Procedure</th>" +
+            "<th style='width:200px'>Doctor</th>" +
+            "</tr></thead><tbody>";
+
+        if (result && result.length > 0) {
+            for (var n = 0; n < result.length; n++) {
+                var r = result[n];
+                head += "<tr class='jsgrid-row' ondblclick='LoadSessionFromView(\"" + r.RegNo + "\"," + r.ProcedureId + ")'>" +
+                    "<td class='text-center'><button class='btn white btn-round btn-xs' type='button' style='background-color:#FF9800' onclick='LoadSessionFromView(\"" + r.RegNo + "\"," + r.ProcedureId + ")'><i class='ft-eye'></i></button></td>" +
+                    "<td>" + r.RegNo + "</td>" +
+                    "<td>" + r.PatientName + "</td>" +
+                    "<td>" + r.ProcedureName + "</td>" +
+                    "<td>" + r.DoctorName + "</td>" +
+                    "</tr>";
+            }
+            $('#tblSessionViewList').html(head + '</tbody>');
+        } else {
+            head += "<tr><td colspan='5' class='text-center'>No records found</td></tr>";
+            $('#tblSessionViewList').html(head + '</tbody>');
+        }
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Double-click / eye-icon → load that treatment into the form
+    // ─────────────────────────────────────────────────────────
+    function LoadSessionFromView(RegNo, ProcedureId) {
+        $('#myModalSession').modal('hide');
+        formrefresh();
+
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentGetandGets",
+            data: { RegNo: RegNo, ProcedureId: ProcedureId },
+            success: function (result) {
+                if (result.oHeaderList && result.oHeaderList.length > 0) {
+                    var h = result.oHeaderList[0];
+                    $('#RegNo').val(h.RegNo);
+                    $('#Name').val(h.PatientName);
+                    $('#Age').val(h.Age);
+                    $('#Gender, #Genderhid').val(h.Sex);
+                    $('#Doctor').val(h.DoctorId);
+                    $('#Contact').val(h.Contact);
+                    $('#OpNo').val(h.OPNo);
+                    $('#IpNo').val(h.IPNo);
+                    $('#ProcedureName0').val(h.ProcedureName);
+                    $('#ProcedureId0').val(h.ProcedureId);
+                }
+                if (result.oDayList && result.oDayList.length > 0) {
+                    $('#dayRows').empty();
+                    Count = 0;
+                    $.each(result.oDayList, function (i, d) {
+                        AddDayRow({
+                            DayId: d.RecordID,
+                            Date: d.SessionDate,
+                            Duration: d.Hours,
+                            Room: d.Room,
+                            Therapist: d.TherapistConsultant,
+                            Notes: d.Notes
+                        });
+                    });
+                }
+            }
+        });
+    }
+
+    function LoadTherapistSearch(rowId) {
+        $('#SessionTherapist' + rowId).autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: function (request, response) {
+                $('#SessionTherapistId' + rowId).val(0);
+                $.ajax({
+                    url: '../Session/HMS_TherapistSearch',
+                    type: 'POST',
+                    data: { SearchText: $('#SessionTherapist' + rowId).val() },
+                    dataType: 'json',
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                ColCount: 'ONE',
+                                label: item.Name,
+                                value: item.Name,
+                                "Name": item.Name,
+                                NurseId: item.NurseId,
+                                headers: ["Name"]
+                            };
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                $('#SessionTherapist' + rowId).val(ui.item.value);
+                $('#SessionTherapistId' + rowId).val(ui.item.NurseId);
+                return false;
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Date range picker for Session View modal (mirrors ProcedureBill's LoadDate)
+    // ─────────────────────────────────────────────────────────
+    var SessionDatePickerInit = false;
+
+    function LoadSessionDateRange() {
+        if (SessionDatePickerInit) return;
+        SessionDatePickerInit = true;
+
+        $('#SessionDateFrom, #SessionDateTo').daterangepicker({
+            startDate: new Date(),
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,          
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        });
+    }
+
+    function FilterSessionList() {
+        var keyword = $('#SessionSearch').val().toLowerCase().trim();
+        $('#tblSessionViewList tbody tr').each(function () {
+            if (!keyword) {
+                $(this).show();
+                return;
+            }
+            var regNo = $(this).find('td:eq(1)').text().toLowerCase();
+            var patient = $(this).find('td:eq(2)').text().toLowerCase();
+            var procedure = $(this).find('td:eq(3)').text().toLowerCase();
+            var doctor = $(this).find('td:eq(4)').text().toLowerCase();
+
+            if (regNo.indexOf(keyword) > -1 ||
+                patient.indexOf(keyword) > -1 ||
+                procedure.indexOf(keyword) > -1 ||
+                doctor.indexOf(keyword) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    }
+
+    function formrefresh() {
+        $('.patdet').val('');
+        $('#RegNo').val('');
+        $('#Opseriesname').val('');
+        $('#Doctor, #Gender, #Genderhid').val(0);
+        $('#ProcedureName0').val('');
+        $('#ProcedureId0').val('');
+        $('#TreatmentId').val(0);
+        $('#dayRows').empty();
+        Count = 0;
+        PRID = 0;
+        SessionDatePickerInit = false;   // ← allow date picker to re-init next View open
+        $('.rdonl').attr('readonly', true).css('background-color', 'white');
+        $('#RegNo').focus();
+    }
+
+    function BuildFullRegNo() {
+        var series = $.trim($('#Opseriesname').val() || '');
+        var regno = $.trim($('#RegNo').val() || '');
+        if (series && regno.indexOf(series) === 0) {
+            return regno;          // RegNo already carries the prefix — don't double it
+        }
+        return series + regno;
+    }
+
+    function ConfirmboxResult(Result, status, rowid) {
+        if (Result == 'true' && status == 'refresh') {
+            formrefresh();
+        }
+        $('#confirm').fadeOut();
+    }
+
+    function isNumberOnly(evt) {
+        var charCode = evt.which ? evt.which : event.keyCode;
+        if (charCode != 8 &&
+            (charCode != 46 || $(evt.target).val().indexOf('.') != -1) &&
+            charCode != 13 &&
+            (charCode < 48 || charCode > 57)) {
+            evt.preventDefault();
+            return false;
+        }
+        return true;
+    }
+
+    function warningshow(message, Id) {
+        $('#popupmessage').text(message);
+        $('#Warningpopup').show();
+        if (Id && Id !== '') {
+            try { $('#' + Id).focus().select(); } catch (e) { }
+        }
+        window.setTimeout(function () { $('#Warningpopup').fadeOut(); }, 3000);
+    }
+
+</script>

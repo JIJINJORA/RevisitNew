@@ -1,0 +1,611 @@
+﻿@{
+    ViewBag.Title = "Session Treatment Editor";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script type="text/javascript" src="~/ProjectScript/Windowsprint.js"></script>
+<script src="~/Scripts/Autocomplete/jquery-ui.js"></script>
+<script type="text/javascript" src="~/ProjectScript/CommonHMS.js"></script>
+
+<style>
+    :root {
+        --hms-teal: #009DA0;
+        --hms-teal-dark: #007B7E;
+        --hms-teal-bg: #E0F3F4;
+        --hms-border: #b2dfe0;
+        --hms-row-alt: #f4fbfc;
+        --hms-text: #333;
+    }
+
+    .hms-page-header {
+        background: var(--hms-teal);
+        color: #fff;
+        padding: 13px 22px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: 0.4px;
+        border-radius: 0;
+    }
+
+    .hms-card {
+        background: #fff;
+        border: 1px solid #dde6e9;
+        border-radius: 4px;
+        margin: 16px;
+        padding: 0;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+
+    .hms-filter-band {
+        background: var(--hms-teal-bg);
+        border-bottom: 1px solid var(--hms-border);
+        padding: 14px 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+        .hms-filter-band label {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--hms-teal-dark);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+    #ProcedureName {
+        width: 280px;
+        height: 40px;
+        font-size: 15px;
+        border: 1px solid #b2dfe0;
+        border-radius: 3px;
+        padding: 0 10px;
+    }
+
+        #ProcedureName:focus {
+            border-color: var(--hms-teal);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0,157,160,0.15);
+        }
+
+    #NoOfSessions {
+        width: 150px;
+        height: 40px;
+        font-size: 15px;
+        border: 1px solid #b2dfe0;
+        border-radius: 3px;
+        padding: 0 10px;
+    }
+
+    /* Main action buttons */
+    .btn-hms {
+        background: var(--hms-teal);
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 0 22px;
+        height: 40px;
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.15s;
+    }
+
+        .btn-hms:hover, .btn-hms:focus {
+            background: var(--hms-teal-dark);
+            color: #fff;
+            outline: none;
+        }
+
+    /* "+" add button */
+    .btn-hms-plus {
+        background: var(--hms-teal);
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        width: 40px;
+        height: 40px;
+        font-size: 22px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        transition: background 0.15s;
+    }
+
+        .btn-hms-plus:hover {
+            background: var(--hms-teal-dark);
+        }
+
+    .hms-filter-right {
+        margin-left: auto;
+        display: flex;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .hms-section-title {
+        background: var(--hms-teal-bg);
+        border-bottom: 1px solid var(--hms-border);
+        padding: 10px 18px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--hms-teal-dark);
+        letter-spacing: 0.3px;
+    }
+
+    .hms-table-wrap {
+        padding: 16px 18px 12px;
+    }
+
+    #tblSessionDays {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 15px;
+    }
+
+        #tblSessionDays thead tr {
+            background: var(--hms-teal);
+            color: #fff;
+        }
+
+        #tblSessionDays thead th {
+            padding: 10px 12px;
+            font-weight: 700;
+            border: 1px solid var(--hms-teal-dark);
+            white-space: nowrap;
+            font-size: 15px;
+        }
+
+        #tblSessionDays tbody tr {
+            background: #fff;
+        }
+
+            #tblSessionDays tbody tr:nth-child(even) {
+                background: var(--hms-row-alt);
+            }
+
+            #tblSessionDays tbody tr:hover {
+                background: #d4f0f1;
+            }
+
+        #tblSessionDays tbody td {
+            padding: 8px 10px;
+            border: 1px solid #dde6e9;
+            vertical-align: middle;
+        }
+
+        #tblSessionDays .form-control {
+            height: 36px;
+            font-size: 15px;
+            border: 1px solid #c8dfe0;
+            border-radius: 3px;
+            padding: 0 9px;
+        }
+
+            #tblSessionDays .form-control:focus {
+                border-color: var(--hms-teal);
+                box-shadow: 0 0 0 2px rgba(0,157,160,0.12);
+            }
+
+    /* Remove button in table rows */
+    .btn-remove {
+        background: #e53935;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        padding: 6px 14px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+        .btn-remove:hover {
+            background: #b71c1c;
+        }
+
+    .hms-add-row-wrap {
+        padding: 0 18px 16px;
+    }
+
+    /* jQuery UI autocomplete dropdown */
+    .ui-autocomplete {
+        max-height: 260px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 9999 !important;
+        border: 1px solid var(--hms-teal) !important;
+        border-radius: 3px !important;
+        padding: 0 !important;
+        font-size: 15px;
+    }
+
+    .ui-menu-item {
+        padding: 0 !important;
+    }
+
+    .ui-menu-item-wrapper {
+        padding: 8px 12px !important;
+        color: var(--hms-text);
+    }
+
+        .ui-menu-item-wrapper.ui-state-active,
+        .ui-menu-item-wrapper:hover {
+            background: var(--hms-teal) !important;
+            color: #fff !important;
+            border: none !important;
+            margin: 0 !important;
+        }
+
+   
+    
+</style>
+
+
+
+<!-- Hidden fields -->
+<input type="hidden" id="HidProcedureId" value="0" />
+<input type="hidden" id="HidTreatmentId" value="0" />
+
+<!-- ═══════════════════════════════════════════════════════════
+     PAGE HEADER
+════════════════════════════════════════════════════════════ -->
+<div class="hms-page-header">
+    &#9776;&nbsp; Session Treatment Editor
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CARD
+════════════════════════════════════════════════════════════ -->
+<div class="hms-card">
+
+    <!-- ── Filter / Search Band ── -->
+    <div class="hms-filter-band">
+
+        <label>Procedure</label>
+
+        <!-- Procedure autocomplete -->
+        <input type="text" id="ProcedureName" autocomplete="off"
+               placeholder="Type procedure name..."
+               onfocus="LoadProcedureSearch()" />
+
+        <!-- + open Procedure Master -->
+        <button class="btn-hms-plus" onclick="AddProcedure()" title="Add New Procedure">+</button>
+
+        <label style="margin-left:8px;">No. of Sessions</label>
+
+        <!-- Session count -->
+        <input type="number" id="NoOfSessions" autocomplete="off"
+               placeholder="e.g. 10" min="1" />
+
+        <!-- Apply -->
+        <button class="btn-hms" onclick="ApplySessions()">Apply</button>
+
+        <!-- Save / Clear  -->
+        <div class="hms-filter-right">
+            <button type="button" onclick="SaveSession()" class="btn btn-primary" style="width:120px; height:40px; font-size:15px; font-weight:700;">
+                Save <i class="fa fa-check-square-o"></i>
+            </button>
+            <button type="button" onclick="ClearForm()" class="btn btn-primary" style="width:120px; height:40px; font-size:15px; font-weight:700;">
+                Clear <i class="ft-refresh-cw"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ── Session Days Grid (hidden until Apply / procedure selected) ── -->
+    <div id="divSessionDays" style="display:none;">
+
+        <div class="hms-section-title">Session Days</div>
+
+        <div class="hms-table-wrap">
+            <table id="tblSessionDays">
+                <thead>
+                    <tr>
+                        <th style="width:6%; text-align:center;">SL#</th>
+                        <th style="width:28%;">Session # (After Days)</th>
+                        <th style="width:22%;">Duration (hours)</th>
+                        <th style="width:34%;">Notes</th>
+                        <th style="width:10%; text-align:center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tblSessionBody">
+                    <!-- rows injected by JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="hms-add-row-wrap">
+            <button class="btn-hms" onclick="AddSessionRow(0, 0, '', 0)">+ Add Session</button>
+        </div>
+
+    </div><!-- /divSessionDays -->
+
+</div><!-- /hms-card -->
+
+
+<script>
+   
+    var SessionRowCount = 0;
+
+    // ─────────────────────────────────────────────────────────
+    // Document Ready
+    // ─────────────────────────────────────────────────────────
+    $(document).ready(function () {
+        // Note: do NOT set autocomplete=off on all inputs - breaks jQuery UI autocomplete
+        $('#ProcedureName').focus();
+        document.title = "SessionEditor";
+    });
+
+    // ─────────────────────────────────────────────────────────
+    // Procedure Autocomplete  (HMS multi-column dropdown style)
+    // ─────────────────────────────────────────────────────────
+    // Mirrors ProcedureBill.js LoadTest() pattern exactly
+    function LoadProcedureSearch() {
+        $("#ProcedureName").autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: function (request, response) {
+                var data = {};
+                data.ProcedureName = $("#ProcedureName").val();
+                data.ProcedureId = ERPDeptId;           // matches ProcedureBill pattern
+                $.ajax({
+                    url: '../Session/HMS_ProcedureSearch',
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return ({
+                                ColCount: 'TWOEnq',
+                                label: item.ProcedureCode,
+                                label1: item.ProcedureName,
+                                value: item.ProcedureCode,      // ADD
+                                value1: item.ProcedureName,     // ADD
+                                "Procedure Code": item.ProcedureCode,  // ADD
+                                "Procedure Name": item.ProcedureName,  // ADD
+                                ProcedureId: item.ProcedureId,
+                                Rate: item.Procedurecharge,
+                                ProcedureName: item.ProcedureName,
+                                headers: ["Procedure Code", "Procedure Name"]
+                            });
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                $("#ProcedureName").val(ui.item.ProcedureName);
+                $("#HidProcedureId").val(ui.item.ProcedureId);
+                LoadExistingTreatment(ui.item.ProcedureId);
+            }
+        });
+    }
+
+    function ProcedureAutocomplete() {
+        // Called on document ready - just sets up focus handler
+        // Actual autocomplete wired on focus via LoadProcedureSearch()
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // Load existing treatment when procedure is picked
+    // ─────────────────────────────────────────────────────────
+    function LoadExistingTreatment(procedureId) {
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentEditorGetbyProcedure",
+            data: { ProcedureId: procedureId },
+            success: function (result) {
+                if (result.oHeader && result.oHeader.EditorId > 0) {
+                    $("#HidTreatmentId").val(result.oHeader.EditorId);   // reused field, now holds EditorId
+                    $("#NoOfSessions").val(result.oHeader.NoOfSessions);
+                    LoadExistingDays(result.oDetailList);
+                } else {
+                    $("#HidTreatmentId").val(0);
+                    ClearGrid();
+                    AddSessionRow(0, 0, '', 0);
+                    $("#divSessionDays").show();
+                }
+            }
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // AddProcedure: "+" → Procedure Master in new tab
+    // ─────────────────────────────────────────────────────────
+    function AddProcedure() {
+        window.open('../Master/Proceduremaster', '_blank');
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // ApplySessions: generate N blank rows from spinner
+    // ─────────────────────────────────────────────────────────
+    function ApplySessions() {
+        var procId = $.trim($("#HidProcedureId").val());
+        if (!procId || procId === '0') {
+            warningshow('Please Select a Procedure', 'ProcedureName');
+            return;
+        }
+        var n = parseInt($("#NoOfSessions").val());
+        if (isNaN(n) || n <= 0) {
+            warningshow('Enter a valid No. of Sessions', 'NoOfSessions');
+            return;
+        }
+        ClearGrid();
+        for (var i = 1; i <= n; i++) {
+            AddSessionRow(i, 0, '', 0);
+        }
+        $("#divSessionDays").show();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // LoadExistingDays: populate grid from DB rows
+    // ─────────────────────────────────────────────────────────
+    function LoadExistingDays(dayList) {
+        ClearGrid();
+        if (!dayList || dayList.length === 0) {
+            AddSessionRow(0, 0, '', 0);
+        } else {
+            for (var i = 0; i < dayList.length; i++) {
+                AddSessionRow(dayList[i].AfterDays, dayList[i].Duration, dayList[i].Notes, dayList[i].DetailId);
+            }
+        }
+        $("#divSessionDays").show();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // AddSessionRow: append one editable row
+    // ─────────────────────────────────────────────────────────
+    function AddSessionRow(sessionNum, duration, notes, dayId) {
+        SessionRowCount++;
+        var id = SessionRowCount;
+        dayId = (dayId !== undefined && dayId !== null) ? dayId : 0;
+
+        var row =
+            "<tr id='SRow_" + id + "'>" +
+            "  <td style='text-align:center;'>" + id + "</td>" +
+            "  <td>" +
+            "    <input type='number' id='SessionNum_" + id + "' class='form-control'" +
+            "           placeholder='Session #' min='0' value='" + (sessionNum || '') + "' />" +
+            "    <input type='hidden' id='DayId_" + id + "' value='" + dayId + "' />" +
+            "  </td>" +
+            "  <td>" +
+            "    <input type='number' id='Duration_" + id + "' class='form-control'" +
+            "           placeholder='Hours' min='0' step='0.5' value='" + (duration || '') + "' />" +
+            "  </td>" +
+            "  <td>" +
+            "    <input type='text' id='Notes_" + id + "' class='form-control'" +
+            "           placeholder='Notes' value='" + (notes || '') + "' />" +
+            "  </td>" +
+            "  <td style='text-align:center;'>" +
+            "    <button class='btn-remove' onclick='RemoveSessionRow(" + id + ")'>Remove</button>" +
+            "  </td>" +
+            "</tr>";
+
+        $("#tblSessionBody").append(row);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // RemoveSessionRow: soft-delete DB row or DOM-only remove
+    // ─────────────────────────────────────────────────────────
+    function RemoveSessionRow(id) {
+        $("#SRow_" + id).remove();
+        RenumberRows();
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // RenumberRows: re-index SL# after removal
+    // ─────────────────────────────────────────────────────────
+    function RenumberRows() {
+        var i = 1;
+        $("#tblSessionBody tr").each(function () {
+            $(this).find("td:first").text(i++);
+        });
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // SaveSession: validate → build payload → POST
+    // ─────────────────────────────────────────────────────────
+    function SaveSession() {
+        var procId = $.trim($("#HidProcedureId").val());
+        var procName = $.trim($("#ProcedureName").val());
+
+        if (!procId || procId === '0') {
+            warningshow('Please select a Procedure', 'ProcedureName');
+            return;
+        }
+
+        var rows = $("#tblSessionBody tr");
+        if (rows.length === 0) {
+            warningshow('Please add at least one Session row', '');
+            return;
+        }
+
+        var dayRows = [];
+        var valid = true;
+
+        rows.each(function () {
+            if (!valid) return false;
+            var rowId = $(this).attr('id').replace('SRow_', '');
+            var dayId = parseInt($("#DayId_" + rowId).val() || 0);
+            var sessNum = $.trim($("#SessionNum_" + rowId).val());
+            var dur = $.trim($("#Duration_" + rowId).val());
+            var note = ($("#Notes_" + rowId).val() || '').replace(/[~|]/g, ' ');
+
+            if (sessNum === '' || parseInt(sessNum) < 0) {
+                warningshow('Session # is required in all rows', 'SessionNum_' + rowId);
+                valid = false;
+                return false;
+            }
+
+            dayRows.push(dayId + '~' + parseInt(sessNum) + '~' + parseFloat(dur || 0) + '~' + note);
+       
+        });
+
+        if (!valid) return;
+
+        var data = {};
+        data.EditorId = parseInt($("#HidTreatmentId").val() || 0);
+        data.ProcedureId = procId;
+        data.ProcedureName = procName;
+        data.NoOfSessions = rows.length;
+        data.CreatedBy = ERPUserId;
+        data.SessionDaysJson = dayRows.join('|');   // row format unchanged: dayId~sessNum~duration~notes
+
+        $.ajax({
+            type: "POST",
+            url: "../Session/HMS_SessionTreatmentEditorSave",
+            data: data,
+            success: function (result) {
+                if (result.success && result.Status === 'SUCCESS') {
+                    $("#HidTreatmentId").val(result.EditorId);
+                    swal('Saved Successfully', '', 'success')
+                        .then(function () {
+                            ClearForm();
+                        });
+                    $('.swal-button--confirm').focus();
+                } else {
+                    swal('Error saving record', '', 'error');
+                    $('.swal-button--confirm').focus();
+                }
+            }
+        });
+    }
+    // ─────────────────────────────────────────────────────────
+    // Warning popup - uses Layout's #Warningpopup div
+    // ─────────────────────────────────────────────────────────
+    function warningshow(message, Id) {
+        $('#popupmessage').text(message);
+        $('#Warningpopup').show();
+        if (Id && Id !== '') {
+            try { $('#' + Id).focus().select(); } catch (e) { }
+        }
+        window.setTimeout(function () {
+            $('#Warningpopup').fadeOut();
+        }, 3000);
+    }
+
+    // ─────────────────────────────────────────────────────────
+    // ClearForm
+    // ─────────────────────────────────────────────────────────
+    function ClearForm() {
+        $("#ProcedureName").val('');
+        $("#HidProcedureId").val(0);
+        $("#HidTreatmentId").val(0);
+        $("#NoOfSessions").val('');
+        ClearGrid();
+        $("#divSessionDays").hide();
+        $("#ProcedureName").focus();
+    }
+
+    function ClearGrid() {
+        $("#tblSessionBody").empty();
+        SessionRowCount = 0;
+    }
+
+</script>

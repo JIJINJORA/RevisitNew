@@ -1,0 +1,322 @@
+﻿@model EUMI_ERP.Models.SessionTreatmentModel
+
+@{
+    ViewBag.Title = Model.TreatmentId == 0 ? "New Treatment" : "Edit Treatment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@functions {
+    public string GetDayName(int day)
+    {
+        switch (day)
+        {
+            case 1: return "Monday";
+            case 2: return "Tuesday";
+            case 3: return "Wednesday";
+            case 4: return "Thursday";
+            case 5: return "Friday";
+            case 6: return "Saturday";
+            case 7: return "Sunday";
+            default: return "";
+        }
+    }
+}
+
+<style>
+    .form-section {
+        background: #f9f9f9;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+        .form-section h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+    .table-days th, .table-days td {
+        vertical-align: middle;
+    }
+
+    .btn-clear {
+        margin-left: 5px;
+    }
+
+    .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .field-group {
+        margin-bottom: 15px;
+    }
+
+        .field-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+</style>
+
+@using (Html.BeginForm("Create", "SessionTreatment", FormMethod.Post, new { id = "treatmentForm" }))
+{
+    @Html.HiddenFor(m => m.TreatmentId)
+    @Html.HiddenFor(m => m.TreatmentName) <!-- We'll set it via JavaScript if needed -->
+
+    <!-- Procedure Dropdown -->
+    <div class="form-section">
+        <div class="two-column">
+            <div class="field-group">
+                <label>Procedure *</label>
+                @Html.DropDownListFor(m => m.ProcedureId, (SelectList)ViewBag.ProcedureList, "Select Procedure", new { @class = "form-control", required = "required", id = "ddlProcedure" })
+            </div>
+        </div>
+    </div>
+
+    <!-- Count-based Fields (hidden, not used now) -->
+    <div id="countBasedFields" class="form-section" style="display:none;">
+        <h4>Session Details</h4>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.NumberOfSessions, "Number of Sessions")
+                    @Html.TextBoxFor(m => m.NumberOfSessions, new { @class = "form-control", type = "number", min = "1", id = "sessionsCount" })
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.DefaultDuration, "Duration per Session (hours)")
+                    @Html.TextBoxFor(m => m.DefaultDuration, new { @class = "form-control", type = "number", step = "0.5", min = "0", id = "durationPerSession" })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Day-based Fields -->
+    <div id="dayBasedFields" class="form-section" style="display:none;">
+        <h4>Days and Durations</h4>
+        <table class="table table-bordered table-days" id="daysTable">
+            <thead>
+                <tr>
+                    <th style="width:50px">SL#</th>
+                    <th>SubDivision (Day)</th>
+                    <th>Std Unit (Hours)</th>
+                    <th>Notes</th>
+                    <th style="width:80px">Action</th>
+                </tr>
+            </thead>
+            <tbody id="dayRows">
+                @if (Model.Days != null)
+                {
+                    foreach (var day in Model.Days.OrderBy(d => d.DisplayOrder))
+                    {
+                        <tr class="day-row">
+                            <td class="slno">@day.DisplayOrder</td>
+                            <td>
+                                <input type="hidden" class="day-id" value="@day.DayId" />
+                                <select class="form-control day-of-week" style="width:100%">
+                                    @for (int i = 1; i <= 7; i++)
+                                    {
+                                        <option value="@i" @(day.DayOfWeek == i ? "selected" : "")>@GetDayName(i)</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>
+                                <input type="number" class="form-control day-duration" placeholder="Hours" step="0.5" min="0" value="@day.Duration" />
+                            </td>
+                            <td>
+                                <input type="text" class="form-control day-notes" placeholder="Notes" value="@day.Notes" />
+                            </td>
+                            <td>
+                                <button type="button" class="btn btn-sm btn-danger remove-day">Remove</button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <button type="button" id="addDayRow" class="btn btn-sm btn-primary">Add Day</button>
+    </div>
+
+    <!-- Buttons -->
+    <div class="form-group">
+        <button type="submit" class="btn btn-success">Save</button>
+        <button type="button" id="btnClear" class="btn btn-default btn-clear">Clear</button>
+        <span id="saveStatus" style="margin-left:10px;"></span>
+    </div>
+}
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // On load, if editing, load template based on selected procedure
+            var initialProcedure = $('#ddlProcedure').val();
+            if (initialProcedure) {
+                loadTemplate(initialProcedure);
+            }
+
+            $('#ddlProcedure').change(function () {
+                var procedureId = $(this).val();
+                loadTemplate(procedureId);
+            });
+
+            $('#addDayRow').click(function () {
+                addDayRow(0, 1, '', '', getNextOrder());
+            });
+
+            $('#dayRows').on('click', '.remove-day', function () {
+                $(this).closest('tr').remove();
+                renumberRows();
+            });
+
+            $('#btnClear').click(function () {
+                $('#treatmentForm')[0].reset();
+                $('#dayRows').empty();
+                $('#countBasedFields').hide();
+                $('#dayBasedFields').hide();
+                $('#saveStatus').text('');
+            });
+
+            $('#treatmentForm').submit(function (e) {
+                e.preventDefault();
+                var procedureId = $('#ddlProcedure').val();
+                if (!procedureId) {
+                    $('#saveStatus').text('Please select a procedure.');
+                    return;
+                }
+                // Set TreatmentName from selected procedure text (optional)
+                $('#TreatmentName').val($('#ddlProcedure option:selected').text());
+
+                var formData = {
+                    TreatmentId: $('#TreatmentId').val(),
+                    ProcedureId: procedureId,
+                    TreatmentName: $('#TreatmentName').val(),
+                    TemplateType: 2, // We'll determine dynamically later if needed
+                    IsActive: true,
+                    NumberOfSessions: null,
+                    DefaultDuration: null,
+                    Days: []
+                };
+                var order = 1;
+                $('#dayRows .day-row').each(function () {
+                    var dayId = $(this).find('.day-id').val();
+                    var dayOfWeek = $(this).find('.day-of-week').val();
+                    var duration = $(this).find('.day-duration').val();
+                    var notes = $(this).find('.day-notes').val();
+                    if (dayOfWeek && duration) {
+                        formData.Days.push({
+                            DayId: dayId,
+                            DayOfWeek: dayOfWeek,
+                            Duration: duration,
+                            Notes: notes,
+                            DisplayOrder: order++
+                        });
+                    }
+                });
+
+                $('#saveStatus').text('Saving...');
+                $.ajax({
+                    url: '@Url.Action("Create")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(formData),
+                    success: function (res) {
+                        if (res.success) {
+                            $('#saveStatus').text('Saved successfully!');
+                            setTimeout(function () {
+                                window.location.href = '@Url.Action("Index")';
+                            }, 1000);
+                        } else {
+                            $('#saveStatus').text(res.message || 'Save failed.');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        var errMsg = 'Error.';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errMsg = xhr.responseJSON.message;
+                        } else if (xhr.responseText) {
+                            errMsg = xhr.responseText;
+                        }
+                        $('#saveStatus').text(errMsg);
+                    }
+                });
+            });
+
+            // Helper functions
+            function loadTemplate(procedureId) {
+                if (!procedureId) {
+                    $('#countBasedFields').hide();
+                    $('#dayBasedFields').hide();
+                    return;
+                }
+                $.ajax({
+                    url: '@Url.Action("GetTemplateByProcedure")',
+                    type: 'POST',
+                    data: { procedureId: procedureId },
+                    success: function (data) {
+                        if (!data) {
+                            $('#countBasedFields').hide();
+                            $('#dayBasedFields').hide();
+                            return;
+                        }
+                        if (data.type === 1) {
+                            $('#countBasedFields').show();
+                            $('#dayBasedFields').hide();
+                            $('#sessionsCount').val(data.sessions);
+                            $('#durationPerSession').val(data.duration);
+                        } else if (data.type === 2) {
+                            $('#countBasedFields').hide();
+                            $('#dayBasedFields').show();
+                            $('#dayRows').empty();
+                            var order = 1;
+                            $.each(data.days, function (i, day) {
+                                addDayRow(0, day.dayOfWeek, day.duration, '', order++);
+                            });
+                        }
+                    }
+                });
+            }
+
+            function addDayRow(dayId, dayOfWeek, duration, notes, order) {
+                var days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+                var options = '';
+                for (var i = 0; i < days.length; i++) {
+                    options += '<option value="' + (i+1) + '" ' + (dayOfWeek == i+1 ? 'selected' : '') + '>' + days[i] + '</option>';
+                }
+                var row = '<tr class="day-row">' +
+                    '<td class="slno">' + order + '</td>' +
+                    '<td>' +
+                        '<input type="hidden" class="day-id" value="' + dayId + '" />' +
+                        '<select class="form-control day-of-week" style="width:100%">' + options + '</select>' +
+                    '</td>' +
+                    '<td>' +
+                        '<input type="number" class="form-control day-duration" placeholder="Hours" step="0.5" min="0" value="' + duration + '" />' +
+                    '</td>' +
+                    '<td>' +
+                        '<input type="text" class="form-control day-notes" placeholder="Notes" value="' + notes + '" />' +
+                    '</td>' +
+                    '<td>' +
+                        '<button type="button" class="btn btn-sm btn-danger remove-day">Remove</button>' +
+                    '</td>' +
+                '</tr>';
+                $('#dayRows').append(row);
+                renumberRows();
+            }
+
+            function renumberRows() {
+                $('#dayRows .day-row').each(function(index) {
+                    $(this).find('.slno').text(index + 1);
+                });
+            }
+
+            function getNextOrder() {
+                return $('#dayRows .day-row').length + 1;
+            }
+        });
+    </script>
+}

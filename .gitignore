@@ -8,5 +8,4 @@ packages/
 *.ldf
 *.bak
 .env
-/EUMI_ERP/
 /EUMI_ERP.zip

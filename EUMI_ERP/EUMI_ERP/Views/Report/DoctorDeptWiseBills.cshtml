@@ -1,0 +1,475 @@
+﻿@{
+    ViewBag.Title = "DoctorDeptWiseBills";
+}
+
+<script type="text/javascript" src="~/ProjectScript/ReportPrint.js"></script>
+<script src="~/Scripts/Autocomplete/jquery-ui.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
+<style>
+    .form-control {
+        font-weight: bold;
+    }
+
+    #btnsubmit:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    #btnback:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    #btnprint:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    /* Select2 custom styling to match your theme */
+    .select2-container .select2-selection--multiple {
+        min-height: 38px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-weight: bold;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice {
+        background-color: #009DA0;
+        border: 1px solid #007f82;
+        color: white;
+        border-radius: 3px;
+        padding: 2px 8px;
+        font-weight: bold;
+    }
+
+    .select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+        color: white;
+        margin-right: 5px;
+    }
+
+    .select2-container--default .select2-results__option--highlighted[aria-selected] {
+        background-color: #009DA0;
+    }
+
+    .select2-container {
+        width: 100% !important;
+    }
+
+    .select2-dropdown {
+        border: 1px solid #ced4da;
+        font-weight: bold;
+    }
+
+    .filter-row {
+        display: flex;
+        align-items: center;
+        margin-top: 12px;
+        margin-bottom: 4px;
+    }
+
+    .filter-label {
+        font-weight: bold;
+        min-width: 90px;
+        margin-left: 10px;
+    }
+
+    .filter-control {
+        flex: 1;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="myData" data-x="M369" />
+<div id="Entry">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" style="border-bottom:1px solid #e6e6e6">
+                    <div>
+                        <table width="100%">
+                            <tr>
+                                <td><h4 id="header"></h4></td>
+                                <td width="10%"></td>
+                                <td align="right" width="20%">
+                                    <button type="button" style="width:100px" onclick="$('#popupdiv').show()" id="btnback" class="btn btn-outline-primary">Back</button>
+                                </td>
+                                <td>
+                                    <button type="button" style="width:100px;margin-left:20px" id="btnprint" onclick="PrintthisReportWindows('LABITEMREPORT', $('#LabLength').val())" class="btn btn-primary">Print <i class="ft-printer"></i></button>
+                                </td>
+                                <td align="right">
+                                    <div align="right">
+                                        <div class="heading-elements">
+                                            <div class="btn-group" id="buttonPlace"></div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div align="right">
+                            <div class="heading-elements">
+                                <div id="divreport" style="display:none; overflow:auto">
+                                    <hr style="margin-top:.1%;width:100%" />
+                                    <table id="Tblreport" class="table table-striped table-bordered dataTable" style="width:100%;margin: 0 auto 0 0;"></table><br />
+                                </div>
+                                <div style="display:none">
+                                    <table id="Tblreportprint"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="popupdiv" class="modal fade text-left show" tabindex="-1" role="dialog" aria-labelledby="myheader"
+     style="padding-right: 17px; background:rgba(0,0,0,0.5); display: block; display:none1">
+    <div class="modal-dialog" role="document" style="top:10%">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h3 class="modal-title" id="myheader">Doctor Department Wise Bills</h3>
+                <button type="button" class="close" onclick="popuprefresh()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <form id="monthpopup" style="display:none1">
+                <div class="modal-body">
+
+                    <!-- Date Row -->
+                    <div class="row">
+                        <label style="font-weight:bold;margin-left:11%">From</label>
+                        <div class="col-md-4">
+                            <input type="text" id="DateFrom" class="form-control frsdwn" autocomplete="off">
+                        </div>
+                        <label style="font-weight:bold;margin-left:4%">To</label>
+                        <div class="col-md-4">
+                            <input type="text" id="DateTo" class="form-control frsdwn" autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid #cfd8dc;margin-top:12px;margin-bottom:8px;"></div>
+
+                    <!-- Doctor -->
+                    <div class="filter-row">
+                        <span class="filter-label">Doctor</span>
+                        <div class="filter-control">
+                            <select id="Doctormst" multiple="multiple" style="width:100%"></select>
+                        </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid #cfd8dc;margin-top:8px;margin-bottom:8px;"></div>
+
+                    <!-- Dept -->
+                    <div class="filter-row">
+                        <span class="filter-label">Dept</span>
+                        <div class="filter-control">
+                            <select id="dtype" multiple="multiple" style="width:100%">
+                                <option value="ALL">All</option>
+                                <option value="LAB">Lab</option>
+                                <option value="REG">Registration</option>
+                                <option value="CON">Consultation</option>
+                                <option value="OP">OP</option>
+                                <option value="PH">Pharma</option>
+                                <option value="IP">IP</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="border-bottom:1px solid #cfd8dc;margin-top:8px;margin-bottom:8px;"></div>
+
+                    <!-- Dept -->
+                    <div class="filter-row">
+                        <span class="filter-label">Branch</span>
+                        <div class="filter-control">
+                            <select id="Department0" class="form-control"></select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" style="width:100px;margin-right:6%" id="btnsubmit" class="btn btn-primary">Go</button>
+                    <input type="hidden" id="LabLength" class="form-control" />
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function () {
+
+        // ── Select2 init ──
+        $('#Doctormst').select2({
+            placeholder: 'Select Doctor(s)',
+            allowClear: true,
+            dropdownParent: $('#popupdiv')
+        });
+
+       
+
+        // ── Date pickers ──
+        $('.frsdwn').keydown(function (e) {
+            var key = e.charCode ? e.charCode : e.keyCode ? e.keyCode : 0;
+            if (key == 13) {
+                e.preventDefault();
+                var inputs = $(this).closest('form').find('.frsdwn:enabled');
+                inputs.eq(inputs.index(this) + 1).focus().select();
+            }
+        });
+
+        $('#DateFrom').daterangepicker({
+            minDate: minDate,
+            maxDate: new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        $('#DateTo').daterangepicker({
+            minDate: minDate,
+            maxDate: new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
+            singleDatePicker: true,
+            showDropdowns: true,
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        $('#dtype').select2({
+            placeholder: 'Select Dept(s)',
+            allowClear: true,
+            dropdownParent: $('#popupdiv')
+        });
+
+        $('#dtype').val(['ALL']).trigger('change');
+
+        $('#DateFrom, #DateTo').val(CurDate);
+
+        // ── Submit ──
+        $("#btnsubmit").click(function () {
+            if ($('#DateFrom').val() == '') {
+                alert('Please Select From Date');
+                $('#DateFrom').focus();
+                return;
+            }
+            if ($('#DateTo').val() == '') {
+                alert('Please Select To Date');
+                $('#DateTo').focus();
+                return;
+            }
+
+            $('#Loading').show();
+
+            var selectedDoctors = $('#Doctormst').val();
+            var doctorIds = (selectedDoctors && selectedDoctors.length > 0) ? selectedDoctors.join(',') : '0';
+
+            var deptIds = $('#Department0').val() || '0';
+
+            
+
+            var selectedDepts2 = $('#dtype').val();
+            var medDept = (selectedDepts2 && selectedDepts2.length > 0) ? selectedDepts2.join(',') : 'ALL';
+            var submitData = {};
+            submitData.FromDate = $('#DateFrom').val() + '##' + deptIds + '##' + doctorIds + '##' + medDept;
+            submitData.ToDate = $('#DateTo').val() + '##LB';
+            submitData.TestId = '0';
+
+            $.ajax({
+                type: "POST",
+                url: "../Master/RPT_DoctorDeptWiseBills",
+                data: submitData,
+
+            
+                success: function (result) {
+                    $('#Loading').hide();
+                    $('#divreport').show();
+                    $('#popupdiv').hide();
+                    Showreport(result);
+                }
+            });
+        });
+    });
+
+    // ── Doctor Load ──
+    DoctorLoad();
+    // ── Doctor Load ──
+    function DoctorLoad() {
+        var data = {};
+        data.DoctorId = 0;
+        data.DeptId = ERPDeptId;
+        $.ajax({
+            type: "POST",
+            url: "../Revisit/HMS_RevistDoctorGets",
+            data: data,
+            success: function (result) {
+                if (result.oList.length > 0) {
+                    $("#Doctormst").empty();
+                    $("#Doctormst").append("<option value='0'>All</option>");
+                    for (var i = 0; i < result.oList.length; i++) {
+                        $("#Doctormst").append(
+                            "<option value='" + result.oList[i].DoctorId + "'>" +
+                            result.oList[i].DoctorName + "</option>"
+                        );
+                    }
+                    // ← pre-select "All" by default
+                    $("#Doctormst").val(['0']).trigger('change');
+                }
+            }
+        });
+    }
+
+    // ── Branch Load ──
+    var data = {};
+    data.DeptId = 0;
+    $.ajax({
+        type: "POST",
+        url: "../Master/DepartmentGetandGets",
+        data: data,
+        success: function (result) {
+            $("#Department0").empty();
+            $("#Department0").append("<option value='0'>-All-</option>");
+            if (result.oList.length > 0) {
+                for (var i = 0; i < result.oList.length; i++) {
+                    $("#Department0").append(
+                        "<option value='" + result.oList[i].DepartmentId + "'>" +
+                        result.oList[i].DepartmentName + "</option>"
+                    );
+                }
+            }
+        }
+    });
+
+    function popuprefresh() {
+        $('#popupdiv').hide();
+    }
+
+    function Showreport(result) {
+        $('#LabLength').val(result.length);
+        disable_datatable('Tblreport', 'buttonPlace');
+
+        var responseText = "<thead><tr>" +
+            "<th align='center'>Sl#</th>" +
+            "<th>BillType</th>" +
+            "<th>Date</th>" +
+            "<th>Bill No</th>" +
+            "<th>Patient</th>" +
+            "<th>Doctor</th>" +
+            "<th style='text-align:right;'>Amount</th>" +
+            "</tr></thead><tbody>";
+
+        var totalAmount = 0;   // ← accumulate here
+        var slno = 0;
+
+        for (var i = 0; i < result.length; i++) {
+            var AA = result[i].TestName.split("##");
+
+            if (AA[0] != 'TOTAL') {
+                slno++;
+                var amt = parseFloat(result[i].TestAmount) || 0;
+                totalAmount += amt;   // ← add each row to total
+                responseText +=
+                    '<tr>' +
+                    '<td align="center">' + slno + '</td>' +
+                    '<td>' + (AA[5] || '') + '</td>' +
+                    '<td>' + result[i].BillDate + '</td>' +
+                    '<td>' + result[i].BillNo + '</td>' +
+                    '<td>' + AA[0] + '</td>' +
+                    '<td>' + AA[4] + '</td>' +
+                    '<td align="right">' + amt.toFixed(Decimal) + '</td>' +
+                    '</tr>';
+            }
+            // ← no else needed — skip SP's TOTAL row entirely
+        }
+
+        responseText += '</tbody>';
+
+        // TOTAL in tfoot — always correct regardless of pagination
+        responseText += '<tfoot>' +
+            '<tr style="font-weight:bold; background-color:#e0f7f7;">' +
+            '<td colspan="6" align="right" style="padding-right:10px;">TOTAL</td>' +
+            '<td align="right">' + totalAmount.toFixed(Decimal) + '</td>' +
+            '</tr>' +
+            '</tfoot>';
+
+        $('#Tblreport').html(responseText);
+        $('#Tblreportprint').html(responseText);
+
+        var title = "Doctor Dept Wise Bills - from " + $("#DateFrom").val() + " to " + $("#DateTo").val();
+        datatableWithsearch('Tblreport', true, title, 'buttonPlace');
+        $('#header').text(title);
+    }
+    function disable_datatable(tablename, tableButtonContainerId) {
+        $('#Warningpopup').fadeOut();
+        if ($.fn.DataTable.isDataTable('#' + tablename)) {
+            var table = $('#' + tablename).DataTable();
+            table.destroy();
+            if (tableButtonContainerId) { $("#" + tableButtonContainerId).empty(); }
+        }
+    }
+
+    function datatableWithsearch(tablename, download, title, tableButtonContainerId) {
+        var a = '#' + tablename + ' tfoot th';
+        $(a).each(function () {
+            var title = $(this).text();
+            if (title != ' ')
+                $(this).html('<input type="text" placeholder="Search ' + title + '" style="width:100%" />');
+        });
+
+        var table = null;
+        if (download) {
+            table = $('#' + tablename).DataTable({
+                dom: "<'row'<'col-sm-1'l><'col-sm-11'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-1'i><'col-sm-11'p>>",
+                buttons: [],
+                columnDefs: [
+                    { width: "5%", targets: 0 },
+                    { width: "10%", targets: 1 },
+                    { width: "12%", targets: 2 },
+                    { width: "12%", targets: 3 },
+                    { width: "25%", targets: 4 },
+                    { width: "20%", targets: 5 },
+                    { width: "16%", targets: 6 }
+                ]
+            });
+
+            new $.fn.dataTable.Buttons(table, {
+                buttons: [{
+                    extend: 'collection',
+                    text: 'Export',
+                    buttons: [
+                        { extend: 'excelHtml5', title: title, messageTop: 'MEDOO HMS' },
+                        { extend: 'pdfHtml5', title: title, messageTop: 'MEDOO HMS' },
+                        { extend: 'print', title: title, messageTop: 'MEDOO HMS' }
+                    ]
+                }, 'colvis']
+            });
+
+            table.buttons(0, null).container().appendTo($("#" + tableButtonContainerId));
+            $("#" + tableButtonContainerId).find(".buttons-collection")
+                .addClass("btn-outline-primary mx-1").css("border-radius", "4px");
+        } else {
+            table = $('#' + tablename).DataTable();
+        }
+
+        table.columns().every(function () {
+            var that = this;
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that.search(this.value).draw();
+                }
+            });
+        });
+    }
+
+</script>
+
+<div style="display:none">
+    <input type="text" id="TestId" />
+</div>

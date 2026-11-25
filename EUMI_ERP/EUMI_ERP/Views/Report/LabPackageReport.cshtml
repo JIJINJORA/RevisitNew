@@ -1,0 +1,1040 @@
+﻿
+@{
+    ViewBag.Title = "LabPackageReport";
+}
+
+
+<script type="text/javascript" src="~/ProjectScript/ReportPrint.js"></script>
+<script type="text/javascript" src="../Projectscript/Common.js"></script>
+<script src="~/Scripts/Autocomplete/jquery-ui.js"></script>
+
+<style>
+    .form-control {
+        font-weight: bold;
+    }
+
+    #btnsubmit:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    #btnback:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    #btnprint:hover {
+        -ms-transform: scale(1.1);
+        transform: scale(1.1);
+    }
+
+    .paid-badge {
+        background-color: #d4edda;
+        color: #155724;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+
+    .pending-badge {
+        background-color: #fff3cd;
+        color: #856404;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 11px;
+        font-weight: bold;
+        white-space: nowrap;
+    }
+    #Tblreport tr.pk-first td {
+        border-top: 2px solid #9fd8e0;
+    }
+
+    #Tblreport tr.pk-cont td {
+        font-size: 13px;
+    }
+    #Tblreport td.tn {
+        white-space: nowrap;
+    }
+
+    #Tblreport tr.pk-first td {
+        border-top: 2px solid #9fd8e0;
+    }
+
+    #Tblreport tr.pk-cont td {
+        font-size: 13px;
+    }
+    #Tblreport td.mg {
+        vertical-align: middle;
+        text-align: center;
+        background: #fff;
+    }
+
+    #Tblreport.table-striped tbody tr.pg-odd {
+        background-color: #f4f6f6;
+    }
+
+    #Tblreport.table-striped tbody tr.pg-even {
+        background-color: #fff;
+    }
+
+    #Tblreport.table-hover tbody tr:hover {
+        background-color: #bdf4fa;
+    }
+</style>
+
+<div class="myData" data-x="" />
+<div id="Entry">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header" style="border-bottom:1px solid #e6e6e6">
+                    <div>
+
+
+                        <table width="100%">
+                            <tr>
+                                <td><h4 id="header"></h4></td>
+                                <td>
+                                    <div class="custom-control custom-radio" style="display:inline-block; margin-right:15px;">
+                                        <input type="radio" class="custom-control-input" name="rptView" id="rptSummary" checked>
+                                        <label class="custom-control-label" for="rptSummary" style="font-weight:bold">Summary</label>
+                                    </div>
+                                    <div class="custom-control custom-radio" style="display:inline-block; margin-right:15px;">
+                                        <input type="radio" class="custom-control-input" name="rptView" id="rptDetailedTest">
+                                        <label class="custom-control-label" for="rptDetailedTest" style="font-weight:bold">Detailed (Test)</label>
+                                    </div>
+                                    <div class="custom-control custom-radio" style="display:inline-block;">
+                                        <input type="radio" class="custom-control-input" name="rptView" id="rptDetailed">
+                                        <label class="custom-control-label" for="rptDetailed" style="font-weight:bold">Detailed</label>
+                                    </div>
+                                    <div class="custom-control custom-radio" style="display:inline-block; margin-left:15px;">
+                                        <input type="radio" class="custom-control-input" name="rptView" id="rptPackageList">
+                                        <label class="custom-control-label" for="rptPackageList" style="font-weight:bold">Package List</label>
+                                    </div>
+                                </td>
+                                <td align="right"><button type="button" style="width:100px" onclick="$('#popupdiv').show(), $('#User').focus()" id="btnback" class="btn btn-outline-primary">Back</button></td>
+                                <td><button type="button" style="width:100px;margin-left:20px" id="btnprint" onclick="PrintLabPackage()" class="btn btn-primary">Print <i class="ft-printer"></i></button></td>
+
+                                <td align="right">
+
+                                    <div class="btn-group" id="buttonPlace">
+
+                                        <div align="right">
+                                            <div class="heading-elements">
+                                                <div class="btn-group" id="buttonPlace">
+
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </td>
+
+                            </tr>
+                        </table>
+
+
+                        <div align="right">
+
+                            <div class="heading-elements">
+
+                                <div id="divreport" style="display:none; overflow:auto">
+                                    <hr style="margin-top:.1%;" />
+
+                                    <table id="Tblreport" class="table table-striped table-bordered dataTable" style="width:100%;margin: 0 auto 0 0;"></table><br />
+                                </div>
+                                <div style="display:none">
+                                    <table id="Tblreportprint"></table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div id="popupdiv" class="modal fade text-left show" tabindex="-1" role="dialog" aria-labelledby="myheader" style="padding-right: 17px; background:rgba(0,0,0,0.5); display: block; display:none1">
+    <div class="modal-dialog" role="document" style="top:10%">
+        <div class="modal-content">
+            <div class="modal-header bg-primary white">
+                <h3 class="modal-title" id="myheader">Lab Package Report</h3>
+                <button type="button" class="close" onclick="popuprefresh()" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <form id="monthpopup" style="display:none1">
+                <div class="modal-body">
+                    <div class="row">
+                        <label style="font-weight:bold;margin-left:11%">From</label>
+                        <div class="col-md-4">
+                            <input type="text" id="DateFrom" class="form-control" autocomplete="off">
+                        </div>
+
+
+                        <label style="font-weight:bold;margin-left:4%">To</label>
+                        <div class="col-md-4">
+                            <input type="text" id="DateTo" class="form-control" autocomplete="off">
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:center;margin:3% 6% 0 6%">
+                        <label style="width:120px;margin:0;font-weight:bold">Patient</label>
+                        <input type="text" id="PatientName" class="form-control" style="flex:1" placeholder="Type patient name / reg no" autocomplete="off" />
+                        <input type="hidden" id="PatientRegNo" value="0" />
+                    </div>
+
+                    <div style="display:flex;align-items:center;margin:3% 6% 0 6%">
+                        <label style="width:120px;margin:0;font-weight:bold">Group</label>
+                        <select id="Hospital" class="form-control" style="flex:1"></select>
+                    </div>
+
+                    <div style="display:flex;align-items:center;margin:3% 6% 0 6%">
+                        <label style="width:120px;margin:0;font-weight:bold">Package Name</label>
+                        <select id="PackageId" class="form-control" style="flex:1"></select>
+                    </div>
+
+                    <div style="display:flex;align-items:center;margin:3% 6% 0 6%">
+                        <label style="width:120px;margin:0;font-weight:bold">User</label>
+                        <select id="UserId" class="form-control" style="flex:1"></select>
+                    </div>
+
+
+
+
+                </div>
+
+                <div class="modal-footer">
+
+
+                    <table width="100%">
+                        <tr>
+                            <td align="left">
+                                <div class="custom-control custom-checkbox" style="display:inline-block; margin-right:15px;">
+                                    <input type="checkbox" class="custom-control-input" name="customCheck" id="grpbyall" autocomplete="off">
+                                    <label class="custom-control-label" for="grpbyall" style="font-weight:bold">Day Wise</label>
+                                </div>
+                                
+                            </td>
+                            <td align="right">
+                                <button type="button" style="width:100px;margin-right:6%" id="btnsubmit" class="btn btn-primary">Go</button>
+                                <input type="hidden" id="LabBillLength" class="form-control" />
+                            </td>
+                        </tr>
+                    </table>
+                    @*<button type="button" style="width:100px;margin-right:6%" id="btnsubmit" class="btn btn-primary">Go</button>
+                        <input type="hidden" id="LabBillLength" class="form-control" />*@
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<div id="paymentHistoryModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; overflow-y:auto;">
+    <div style="background:#fff; width:650px; margin:60px auto; border-radius:8px; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+        <div style="background:#00bcd4; color:#fff; padding:15px 20px; border-radius:8px 8px 0 0; display:flex; justify-content:space-between; align-items:center;">
+            <h5 style="margin:0; font-size:16px;">
+                <i class="ft-credit-card"></i> Payment History
+            </h5>
+            <span onclick="$('#paymentHistoryModal').hide()" style="cursor:pointer; font-size:20px; font-weight:bold;">&times;</span>
+        </div>
+        <div id="paymentHistoryBody" style="padding:20px;">
+            <div class="text-center"><i class="fa fa-spinner fa-spin"></i> Loading...</div>
+        </div>
+    </div>
+</div>
+<script>
+
+    UserList();
+    PackageLoad();
+    LoadPatientSearch();
+
+    function PackageLoad() {
+        $.ajax({
+            type: "POST",
+            url: "../Master/CostCenterGetandGets",
+            data: { CostCenterId: 0 },
+            success: function (result) {
+                $("#PackageId").empty().append("<option value='0'>ALL</option>");
+                var list = result.oList || [];
+                for (var i = 0; i < list.length; i++) {
+                    $("#PackageId").append("<option value='" + list[i].CostCenterId + "'>" + list[i].CostCenterName + "</option>");
+                }
+            }
+        });
+    }
+    function RunReport() {
+        var mode = $("#rptPackageList").prop("checked") ? "list"
+            : ($("#rptDetailedTest").prop("checked") ? "test"
+                : ($("#rptDetailed").prop("checked") ? "detail" : "summary"));
+        var DFlag = (mode === "list") ? 2
+            : ((mode === "detail" && $("#grpbyall").prop("checked")) ? 1 : 0);   // Day Wise only for plain Detailed
+
+        $('#Loading').show();
+
+        var data = {};
+        data.FromDate = $('#DateFrom').val() + '##' + DFlag;
+        data.ToDate = $('#DateTo').val() + '##' + ($('#PackageId').val() || 0);
+        data.RegNo = parseInt($('#PatientRegNo').val() || 0);
+        data.UserId = parseInt($('#UserId').val() || 0);
+
+        $.ajax({
+            type: "POST",
+            url: "../Master/LabPackageReport",
+            data: data,
+            success: function (result) {
+                $('#Loading').hide();
+                $('#divreport').show();
+                $('#popupdiv').hide();
+                if (mode === "list") ShowPackageList(result);
+                else if (mode === "test") Showreport(result, true, true);
+                else if (mode === "detail") Showreport(result, true, false);
+                else ShowSummary(result);
+            }
+        });
+    }
+    function LoadPatientSearch() {
+        $("#PatientName").autocomplete({
+            delay: 0,
+            minLength: 1,
+            source: function (request, response) {
+                $('#PatientRegNo').val(0);           // typing again clears the previous pick
+                $.ajax({
+                    url: '../Revisit/HMS_IPorPatientSearch',
+                    type: "POST",
+                    data: { PatientName: $("#PatientName").val(), DeptId: ERPDeptId },
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            return {
+                                ColCount: '2',
+                                label: item.PatientName,
+                                label1: item.OPSerName + ' - ' + item.OPNumber,
+                                OPNumber: item.OPNumber,
+                                PatientName: item.PatientName,
+                                headers: ["Patient", "RegNo"]
+                            };
+                        }));
+                    }
+                });
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                $('#PatientRegNo').val(ui.item.OPNumber);
+                $('#PatientName').val(ui.item.PatientName);
+                return false;
+            }
+        }).on('input', function () {
+            if ($(this).val() == '') $('#PatientRegNo').val(0);   // emptied box means ALL patients
+        });
+    }
+    function popuprefresh() {
+        $('#popupdiv').hide();
+    }
+
+
+    function UserList() {
+
+        var data = {};
+        data.UserId = 0;
+        $.ajax({
+            type: "POST",
+            url: "../Master/UsersGetandGets",
+            data: data,
+            success: function (result) {
+                ShowUserslist(result.oList);
+            }
+        });
+
+    }
+
+
+
+    var data = {};
+    data.HospitalId = 0;
+    $.ajax({
+        type: "POST",
+        url: "../Master/HospitalGetandGets",
+        data: data,
+        success: function (result) {
+            ShowTermlist(result.oList);
+        }
+    });
+
+    function ShowTermlist(result) {
+        //console.log(result)
+        $("#Hospital").html('')
+
+        $("#Hospital").append("<option value=0>ALL</option>");
+        for (var i = 0; i < result.length; i++) {
+            $("#Hospital").append("<option value=" + result[i].HospitalId + ">" + result[i].HospitalName + "</option>");
+        }
+    }
+
+
+    function ShowUserslist(result) {
+        $("#UserId").append("<option value='0'>All</option>");
+        for (var i = 0; i < result.length; i++) {
+
+            $("#UserId").append("<option value='" + result[i].UserId + "'>" + result[i].UserName + "</option>");
+
+        }
+
+    }
+
+    function TestsText(t) {
+        if (!t) return '';
+        var a = t.split('|'), n = [];
+        for (var i = 0; i < a.length; i++) n.push(a[i].split('~')[0]);
+        return n.join(', ');            // use n.join('<br>') for one test per line
+    }
+    function ToggleListFilters() {
+        var isList = $('#rptPackageList').prop('checked');
+        $('#PatientName, #UserId, #grpbyall').prop('disabled', isList);
+        if (isList) { $('#PatientName').val(''); $('#PatientRegNo').val(0); $('#UserId').val('0'); }
+    }
+
+    function ShowPackageList(result) {
+        disable_datatable('Tblreport', 'buttonPlace');
+
+        var f2 = function (v) { return (parseFloat(v) || 0).toFixed(Decimal); };
+
+        // inline styles on purpose: the Print window does not load this page's CSS
+        var S_HEAD = 'display:flex;justify-content:space-between;gap:12px;padding-bottom:3px;margin-bottom:2px;border-bottom:1px solid #888;color:#555;font-size:12px;';
+        var S_ROW = 'display:flex;justify-content:space-between;gap:12px;padding:2px 0;border-bottom:1px dashed #bbb;';
+        var S_TOT = 'display:flex;justify-content:space-between;gap:12px;padding-top:4px;margin-top:3px;border-top:1px solid #444;font-weight:bold;';
+
+        var thead = "<thead><tr>"
+            + "<th style='width:5%'>Sl#</th>"
+            + "<th style='width:20%'>Package Name</th>"
+            + "<th style='width:55%'>Tests Included</th>"
+            + "<th style='width:20%;text-align:right;'>Package Price</th>"
+            + "</tr></thead>";
+
+        var body = "<tbody>", n = 0;
+        for (var i = 0; i < result.length; i++) {
+            var r = result[i];
+            if (r.Name == 'Total') continue;
+            n++;
+
+            var testsHtml = '<div class="pl-head" style="' + S_HEAD + '"><span>Test</span><span>Rate</span></div>';
+            var sum = 0;
+            var a = (r.Tests || '').split('|');
+            for (var k = 0; k < a.length; k++) {
+                if (!a[k]) continue;
+                var p = a[k].split('~');
+                var rate = (p.length > 1) ? (parseFloat(p[1]) || 0) : 0;
+                sum += rate;
+                testsHtml += '<div class="pl-row" style="' + S_ROW + '"><span>' + p[0] + '</span><span>' + f2(rate) + '</span></div>';
+            }
+            testsHtml += '<div class="pl-tot" style="' + S_TOT + '"><span>Total of tests</span><span>' + f2(sum) + '</span></div>';
+
+            body += "<tr><td>" + n + "</td>"
+                + "<td><b>" + (r.PName || '') + "</b></td>"
+                + "<td>" + testsHtml + "</td>"
+                + "<td align=right><b>" + f2(r.TotalAmt) + "</b></td></tr>";
+        }
+        body += "</tbody>";
+
+        $('#Tblreport').html(thead + body);
+        $('#Tblreportprint').html(thead + body);
+
+        var title = "Lab Package List";
+
+        // Excel / PDF: flatten the test block to "Test - Rate" lines (print button keeps the layout)
+        var exportOpts = {
+            stripHtml: false,
+            format: {
+                body: function (data, row, col) {
+                    var $d = $('<div>').html(data);
+                    if (col !== 2) return $d.text();
+                    var out = [];
+                    $d.find('.pl-row').each(function () {
+                        var s = $(this).children('span');
+                        out.push($(s[0]).text() + ' - ' + $(s[1]).text());
+                    });
+                    var t = $d.find('.pl-tot span');
+                    if (t.length > 1) out.push('Total of tests: ' + $(t[1]).text());
+                    return out.join('\n');
+                }
+            }
+        };
+
+        var table = $('#Tblreport').DataTable({
+            pageLength: 50,
+            dom: "<'row'<'col-sm-1'l><'col-sm-11'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-1'i><'col-sm-11'p>>",
+            buttons: []
+        });
+        new $.fn.dataTable.Buttons(table, {
+            buttons: [{
+                extend: 'collection', text: 'Export',
+                buttons: [
+                    { extend: 'excelHtml5', title: title, exportOptions: exportOpts },
+                    { extend: 'pdfHtml5', title: title, exportOptions: exportOpts },
+                    { extend: 'print', title: title }
+                ]
+            }, 'colvis']
+        });
+        table.buttons(0, null).container().appendTo($("#buttonPlace"));
+        $("#buttonPlace").find(".buttons-collection").addClass("btn-outline-primary mx-1").css("border-radius", "4px");
+
+        $('#LabBillLength').val(n);
+        $('#header').text(title);
+    }
+
+    function DoctorLoad() {
+        var data = {};                                       //dropdownbind
+        data.DoctorId = 0;
+        data.DeptId = ERPDeptId;
+        $.ajax({
+            type: "POST",
+            url: "../Revisit/HMS_RevistDoctorGets",
+            data: data,
+            success: function (result) {
+                if (result.oList.length > 0) {
+                    $("#Doctor").empty();
+                    $("#Doctor").append("<option value='0' Fee='0'>Select</option>");
+                    for (var i = 0; i < result.oList.length; i++) {
+                        $("#Doctor").append("<option value='" + result.oList[i].DoctorId + "' Fee='" + result.oList[i].ConsultFees + "'>" + result.oList[i].DoctorName + "</option>");
+                    }
+                }
+            }
+        });
+    }
+
+    function RepCell(first, v) {
+        return first ? v : '<span style="display:none">' + v + '</span>';
+    }
+
+    function Showreport(result, isDetailed, showTests) {
+        disable_datatable('Tblreport', 'buttonPlace');
+
+        var responseText = "<thead><tr>"
+            + "<th align=center>Sl#</th>"
+            + "<th>Reg#</th>"
+            + "<th>Package Name</th>"
+            + (showTests ? "<th>Test Name</th>" : "")
+            + "<th>Date</th>"
+            + "<th>Time</th>"
+            + "<th>Patient</th>"
+            + "<th>Doctor</th>"
+            + "<th>BNo#</th>"
+            + "<th>Cash</th>"
+            + "<th>UPI</th>"
+            + "<th>Credit</th>"
+            + "<th style='text-align:right;'>Amount</th>";
+
+        if (isDetailed) {
+            responseText += "<th style='text-align:right;'>Balance</th>"
+                + "<th style='text-align:center;'>Status</th>";
+        }
+
+        responseText += "<th style='text-align:right;'>Dis</th>"
+            + "<th style='text-align:right;'>Total</th>"
+            + "</tr></thead><tbody>";
+
+        var f2 = function (v) { return parseFloat(v).toFixed(Decimal); };
+        var bills = 0, rows = 0;
+
+        for (var i = 0; i < result.length; i++) {
+            var r = result[i];
+            var spstring = (r.Department || '').split("##");
+
+            if (r.Name == 'Total') {
+                rows++;
+                responseText += '<tr style=background-color:#d3d3d3>'
+                    + '<td></td><td></td><td></td>' + (showTests ? '<td></td>' : '')
+                    + '<td>' + r.BillDate + '</td>'
+                    + '<td></td>'
+                    + '<td><b>' + r.Name + '</b></td>'
+                    + '<td>' + r.Hospital + '</td>'
+                    + '<td>' + r.BillNo + '</td>'
+                    + '<td align=right>' + spstring[0] + '</td>'
+                    + '<td align=right>' + spstring[1] + '</td>'
+                    + '<td align=right>' + spstring[2] + '</td>'
+                    + '<td align=right><b>' + f2(r.NetAmt) + '</b></td>';
+
+                if (isDetailed) {
+                    responseText += '<td align=right><b>' + f2(r.BalanceAmount) + '</b></td><td></td>';
+                }
+
+                responseText += '<td align=right><b>' + f2(r.DiscAmt) + '</b></td>'
+                    + '<td align=right><b>' + f2(r.TotalAmt) + '</b></td>'
+                    + '</tr>';
+                continue;
+            }
+
+            bills++;
+            var tests = (showTests && r.Tests) ? r.Tests.split('|') : [''];
+            var statusClass = (r.PaymentStatus === 'Paid') ? 'paid-badge' : 'pending-badge';
+            var balanceColor = (r.PaymentStatus === 'Paid') ? '' : 'color:red;';
+
+            for (var t = 0; t < tests.length; t++) {
+                var first = (t === 0);
+                var testName = tests[t].split('~')[0];
+                var rowCls = showTests ? ((first ? 'pk-first' : 'pk-cont') + (bills % 2 ? ' pg-odd' : ' pg-even')) : '';
+                var mg = showTests ? ' class="mg"' : '';
+                rows++;
+
+                responseText += '<tr class="' + rowCls + '" data-g="' + i + '">'
+                    + '<td' + (showTests ? ' class="mg"' : ' align=center') + '>' + bills + '</td>'
+                    + '<td' + mg + '>' + r.RegNo + '</td>'
+                    + '<td' + mg + '>' + (showTests ? '<b>' + (r.PName || '') + '</b>' : (r.PName || '')) + '</td>'
+                    + (showTests ? '<td class="tn">' + testName + '</td>' : '')
+                    + '<td>' + RepCell(first, r.BillDate) + '</td>'
+                    + '<td>' + RepCell(first, spstring[3] || '') + '</td>'
+                    + '<td>' + RepCell(first, r.Name) + '</td>'
+                    + '<td>' + RepCell(first, r.Hospital) + '</td>'
+                    + '<td>' + RepCell(first, r.BillNo) + '</td>'
+                    + '<td align=right>' + (first ? spstring[0] : '-') + '</td>'
+                    + '<td align=right>' + (first ? spstring[1] : '-') + '</td>'
+                    + '<td align=right>' + (first ? spstring[2] : '-') + '</td>'
+                    + '<td align=right>' + (first ? f2(r.NetAmt) : '-') + '</td>';
+
+                if (isDetailed) {
+                    responseText += '<td align=right style="' + balanceColor + '">' + (first ? f2(r.BalanceAmount) : '-') + '</td>'
+                        + '<td align=center>'
+                        + (first
+                            ? '<span class="' + statusClass + '" style="cursor:pointer;" '
+                            + 'onclick="ShowPaymentHistory(' + r.BillNo + ',' + new Date().getFullYear() + ',\'' + r.Name + '\')">'
+                            + r.PaymentStatus + '</span>'
+                            : '')
+                        + '</td>';
+                }
+
+                responseText += '<td align=right>' + (first ? f2(r.DiscAmt) : '-') + '</td>'
+                    + '<td align=right>' + (first ? f2(r.TotalAmt) : '-') + '</td>'
+                    + '</tr>';
+            }
+        }
+
+        var tfootHtml = '<tfoot><tr>'
+            + '<th></th><th></th><th></th>' + (showTests ? '<th></th>' : '') + '<th></th><th></th>'
+            + '<th>Patient</th><th>Doctor</th>'
+            + '<th></th><th></th><th></th><th></th><th></th>';
+
+        if (isDetailed) {
+            tfootHtml += '<th></th><th></th>';
+        }
+
+        tfootHtml += '<th></th><th></th></tr></tfoot>';
+
+        $('#Tblreport').html(responseText + '</tbody>' + tfootHtml);
+        $('#Tblreportprint').html(responseText + '</tbody>');
+
+        var title = "Lab Package Report - from " + $("#DateFrom").val() + " to " + $("#DateTo").val();
+        datatableWithsearch2('Tblreport', true, title, 'buttonPlace', isDetailed, showTests);
+        $('#LabBillLength').val(rows);
+        $('#header').text(title);
+    }
+
+    function datatableWithsearch2(tablename, download, title, tableButtonContainerId, isDetailed, showTests) {
+
+        var a = '#' + tablename + ' tfoot th'
+        $(a).each(function () {
+            var title = $(this).text();
+            if (title != ' ')
+                $(this).html('<input type="text" placeholder="Search ' + title + '" style="width:100%" />');
+
+        });
+        var table = null;
+        if (download) {
+
+            if (!title || !tableButtonContainerId) { console.log("download table need title and button container"); }
+
+            var colDefs = showTests ? [
+                { "width": "3%", "targets": 0 },
+                { "width": "5%", "targets": 1 },
+                { "width": "8%", "targets": 2 },
+                { "width": "24%", "targets": 3 },
+                { "width": "7%", "targets": 4 },
+                { "width": "6%", "targets": 5 },
+                { "width": "12%", "targets": 6 },
+                { "width": "9%", "targets": 7 }
+            ] : [];
+
+            table = $('#' + tablename).DataTable({
+                "pageLength": 50,
+                "ordering": !showTests,
+                "order": [],
+                "drawCallback": function () { if (showTests) MergePackageCells('#' + tablename); },
+                dom: "<'row'<'col-sm-1'l><'col-sm-11'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-1'i><'col-sm-11'p>>",
+                buttons: [],
+                "columnDefs": colDefs
+            });
+
+            var allCols = table.columns().indexes().toArray();
+            new $.fn.dataTable.Buttons(table, {
+                buttons: [
+                    {
+                        extend: 'collection',
+                        text: 'Export',
+                        buttons: [
+                            { extend: 'excelHtml5', title: title, messageTop: '', exportOptions: { columns: allCols } },
+                            { extend: 'pdfHtml5', title: title, messageTop: '', exportOptions: { columns: allCols } },
+                            { extend: 'print', title: title, messageTop: '', exportOptions: { columns: allCols } }
+                        ]
+                    },
+                    'colvis'
+                ]
+            });
+
+            table.buttons(0, null).container().appendTo($("#" + tableButtonContainerId));
+            $("#" + tableButtonContainerId).find(".buttons-collection").addClass("btn-outline-primary mx-1").css("border-radius", "4px");
+        }
+        else {
+            table = $('#' + tablename).DataTable();
+        }
+        table.columns().every(function () {
+            var that = this;
+            $('input', this.footer()).on('keyup change', function () {
+                if (that.search() !== this.value) {
+                    that
+                        .search(this.value)
+                        .draw();
+
+                }
+            });
+        });
+    }
+
+    $(function () {
+
+        $('#popupdiv').show();
+        $('#DateFrom').focus();
+
+        $('#DateFrom').daterangepicker({
+            minDate: new Date('1/1/2020'),
+            maxDate: new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
+            singleDatePicker: true,
+            showDropdowns: true,
+            startDate: CurDate,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        });
+
+        $('#DateTo').daterangepicker({
+            minDate: new Date('1/1/2020'),
+            maxDate: new Date(new Date().getFullYear() + 1, new Date().getMonth(), new Date().getDate()),
+            singleDatePicker: true,
+            showDropdowns: true,
+            startDate: CurDate,
+            locale: {
+                format: 'DD/MM/YYYY'
+            }
+        });
+
+        $('#DateFrom').val(CurDate);
+        $('#DateTo').val(CurDate);
+
+        $("#btnsubmit").click(function (e) {
+            if ($('#DateFrom').val() == '') {
+                alert('Please Select From Date');
+                $('#DateFrom').focus();
+                return;
+            }
+            if ($('#DateTo').val() == '') {
+                alert('Please Select To Date');
+                $('#DateTo').focus();
+                return;
+            }
+            RunReport();
+        });
+
+        $('input[name="rptView"]').on('change', function () {
+            ToggleListFilters();
+            if ($('#divreport').is(':visible')) RunReport();     // switch view without going back
+        });
+    });
+
+
+    function MergePackageCells(sel) {
+        var prev = null, first = null, span = 0;
+        $(sel + ' tbody tr').each(function () {
+            var cells = $(this).find('td:nth-child(-n+3)');
+            cells.removeAttr('rowspan').css('display', '');          // reset before merging
+            var g = $(this).attr('data-g');
+            if (g !== undefined && g === prev) {
+                cells.css('display', 'none');
+                span++;
+                first.find('td:nth-child(-n+3)').attr('rowspan', span);
+            } else {
+                first = $(this); span = 1; prev = (g === undefined ? null : g);
+            }
+        });
+    }
+
+
+    function ShowSummary(result) {
+        disable_datatable('Tblreport', 'buttonPlace');
+
+        var map = {}, order = [];
+        for (var i = 0; i < result.length; i++) {
+            var r = result[i];
+            if (r.Name == 'Total') continue;                 // skip day-wise subtotal rows
+            var sp = (r.Department || '').split('##');
+            var key = r.PName || '(No Package)';
+            if (!map[key]) {
+                map[key] = { cnt: 0, cash: 0, upi: 0, credit: 0, net: 0, dis: 0, total: 0, tests: '' };
+
+                order.push(key);
+            }
+            var m = map[key];
+            if (!m.tests) m.tests = r.Tests || '';
+            m.cnt++;
+            m.cash += parseFloat(sp[0]) || 0;
+            m.upi += parseFloat(sp[1]) || 0;
+            m.credit += parseFloat(sp[2]) || 0;
+            m.net += parseFloat(r.NetAmt) || 0;
+            m.dis += parseFloat(r.DiscAmt) || 0;
+            m.total += parseFloat(r.TotalAmt) || 0;
+        }
+
+        var thead = "<thead><tr>"
+            + "<th>Sl#</th><th>Package Name</th><th style='text-align:right;'>Count</th>"
+            + "<th style='text-align:right;'>Cash</th><th style='text-align:right;'>UPI</th>"
+            + "<th style='text-align:right;'>Credit</th><th style='text-align:right;'>Amount</th>"
+            + "<th style='text-align:right;'>Dis</th><th style='text-align:right;'>Total</th>"
+            + "</tr></thead>";
+
+        var body = "<tbody>", g = { cnt: 0, cash: 0, upi: 0, credit: 0, net: 0, dis: 0, total: 0 };
+        for (var j = 0; j < order.length; j++) {
+            var k = order[j], x = map[k];
+            body += "<tr><td>" + (j + 1) + "</td><td>" + k + "</td>"
+                + "<td align=right>" + x.cnt + "</td>"
+                + "<td align=right>" + x.cash.toFixed(Decimal) + "</td>"
+                + "<td align=right>" + x.upi.toFixed(Decimal) + "</td>"
+                + "<td align=right>" + x.credit.toFixed(Decimal) + "</td>"
+                + "<td align=right>" + x.net.toFixed(Decimal) + "</td>"
+                + "<td align=right>" + x.dis.toFixed(Decimal) + "</td>"
+                + "<td align=right>" + x.total.toFixed(Decimal) + "</td></tr>";
+            for (var f in g) g[f] += x[f];
+        }
+        body += "</tbody>";
+
+        var totalRow = "<tr style='background-color:#d3d3d3;font-weight:bold'><td></td><td>Grand Total</td>"
+            + "<td align=right>" + g.cnt + "</td>"
+            + "<td align=right>" + g.cash.toFixed(Decimal) + "</td>"
+            + "<td align=right>" + g.upi.toFixed(Decimal) + "</td>"
+            + "<td align=right>" + g.credit.toFixed(Decimal) + "</td>"
+            + "<td align=right>" + g.net.toFixed(Decimal) + "</td>"
+            + "<td align=right>" + g.dis.toFixed(Decimal) + "</td>"
+            + "<td align=right>" + g.total.toFixed(Decimal) + "</td></tr>";
+
+        $('#Tblreport').html(thead + body + "<tfoot>" + totalRow + "</tfoot>");
+        $('#Tblreportprint').html(thead + body.replace("</tbody>", totalRow + "</tbody>"));
+
+        var title = "Lab Package Summary - from " + $("#DateFrom").val() + " to " + $("#DateTo").val();
+        var table = $('#Tblreport').DataTable({
+            pageLength: 50,
+            dom: "<'row'<'col-sm-1'l><'col-sm-11'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-1'i><'col-sm-11'p>>",
+            buttons: []
+        });
+        new $.fn.dataTable.Buttons(table, {
+            buttons: [{
+                extend: 'collection', text: 'Export',
+                buttons: [
+                    { extend: 'excelHtml5', title: title },
+                    { extend: 'pdfHtml5', title: title },
+                    { extend: 'print', title: title }
+                ]
+            }, 'colvis']
+        });
+        table.buttons(0, null).container().appendTo($("#buttonPlace"));
+        $("#buttonPlace").find(".buttons-collection").addClass("btn-outline-primary mx-1").css("border-radius", "4px");
+
+        $('#LabBillLength').val(order.length + 1);   // rows incl. grand total, used by Print
+        $('#header').text(title);
+    }
+
+    function ShowPaymentHistory(billNo, billYear, patientName) {
+        $('#paymentHistoryModal').show();
+        $('#paymentHistoryBody').html(
+            '<div class="text-center" style="padding:30px;">' +
+            '<i class="fa fa-spinner fa-spin fa-2x"></i><br/>Loading...</div>'
+        );
+
+        $.ajax({
+            type: 'POST',
+            url: '../Master/LabBillPaymentHistory',
+            data: { BillNo: billNo, BillYear: billYear },
+            success: function (result) {
+                if (!result.success || !result.billInfo || result.billInfo.length === 0) {
+                    $('#paymentHistoryBody').html(
+                        '<p class="text-danger text-center">No data found.</p>'
+                    );
+                    return;
+                }
+
+                var bill = result.billInfo[0];
+                var payments = result.payments;
+                var html = '';
+
+                html += '<div style="background:#f0f9ff; border:1px solid #b3d9f2; border-radius:6px;'
+                    + ' padding:12px 15px; margin-bottom:15px; font-size:13px;">';
+                html += '<div style="display:flex; flex-wrap:wrap; gap:12px;">';
+                html += '<div><strong>Patient:</strong> ' + patientName + '</div>';
+                html += '<div><strong>Bill No:</strong> ' + bill.BillNo + '</div>';
+                html += '<div><strong>Bill Date:</strong> ' + bill.BillDateTime + '</div>';
+                html += '<div><strong>Total Amount:</strong> ₹'
+                    + parseFloat(bill.TotalAmt).toFixed(2) + '</div>';
+                html += '</div></div>';
+
+                html += '<table class="table table-bordered table-sm" '
+                    + 'style="font-size:13px; margin-bottom:8px;">';
+                html += '<thead style="background:#00bcd4; color:#fff;">'
+                    + '<tr>'
+                    + '<th style="width:30px;">#</th>'
+                    + '<th>Date / Time</th>'
+                    + '<th>Transaction</th>'
+                    + '<th style="text-align:right;">Paid</th>'
+                    + '<th style="text-align:right;">Balance</th>'
+                    + '</tr></thead><tbody>';
+
+                var runningBalance = parseFloat(bill.TotalAmt);
+                var rowNum = 1;
+                html += '<tr style="background:#fffbe6;">';
+                html += '<td>' + rowNum++ + '</td>';
+                html += '<td>' + bill.BillDateTime + '</td>';
+                html += '<td>Bill Created (Credit)</td>';
+                html += '<td style="text-align:right; color:#888;">—</td>';
+                html += '<td style="text-align:right; color:red; font-weight:bold;">'
+                    + '₹' + parseFloat(runningBalance).toFixed(2) + '</td>';
+                html += '</tr>';
+                var atBilling = parseFloat(bill.PaidAtBilling);
+                if (atBilling > 0) {
+                    runningBalance -= atBilling;
+                    var modes = [];
+                    if (parseFloat(bill.Cash) > 0)
+                        modes.push('Cash ₹' + parseFloat(bill.Cash).toFixed(2));
+                    if (parseFloat(bill.Upi) > 0)
+                        modes.push('UPI ₹' + parseFloat(bill.Upi).toFixed(2));
+                    if (parseFloat(bill.Card) > 0)
+                        modes.push('Card ₹' + parseFloat(bill.Card).toFixed(2));
+
+                    var balColor = runningBalance <= 0 ? 'green' : 'red';
+                    html += '<tr>';
+                    html += '<td>' + rowNum++ + '</td>';
+                    html += '<td>' + bill.BillDateTime + '</td>';
+                    html += '<td>At Billing'
+                        + (modes.length > 0 ? ' (' + modes.join(' + ') + ')' : '')
+                        + '</td>';
+                    html += '<td style="text-align:right; color:green; font-weight:bold;">'
+                        + '₹' + atBilling.toFixed(2) + '</td>';
+                    html += '<td style="text-align:right; color:' + balColor
+                        + '; font-weight:bold;">₹'
+                        + parseFloat(runningBalance).toFixed(2) + '</td>';
+                    html += '</tr>';
+                }
+                for (var i = 0; i < payments.length; i++) {
+                    var paid = parseFloat(payments[i].PaidAmount);
+                    runningBalance -= paid;
+                    var bColor = runningBalance <= 0 ? 'green' : 'red';
+
+                    html += '<tr>';
+                    html += '<td>' + rowNum++ + '</td>';
+                    html += '<td>' + payments[i].PayDate + '</td>';
+                    html += '<td>Cash Counter Payment'
+                        + (payments[i].ReceivedBy
+                            ? ' <span style="color:#888; font-size:11px;">— '
+                            + payments[i].ReceivedBy + '</span>'
+                            : '')
+                        + '</td>';
+                    html += '<td style="text-align:right; color:green; font-weight:bold;">'
+                        + '₹' + paid.toFixed(2) + '</td>';
+                    html += '<td style="text-align:right; color:' + bColor
+                        + '; font-weight:bold;">₹'
+                        + parseFloat(runningBalance).toFixed(2) + '</td>';
+                    html += '</tr>';
+                }
+
+                html += '</tbody>';
+                var isPaid = runningBalance <= 0;
+                var stLabel = isPaid ? 'Paid' : 'Pending';
+                var stBg = isPaid ? '#d4edda' : '#fff3cd';
+                var stColor = isPaid ? '#155724' : '#856404';
+
+                html += '<tfoot><tr style="background:#f8f9fa; font-weight:bold;">';
+                html += '<td colspan="3" style="text-align:right;">Current Balance &amp; Status</td>';
+                html += '<td style="text-align:right; font-size:14px;">₹'
+                    + parseFloat(runningBalance <= 0 ? 0 : runningBalance).toFixed(2)
+                    + '</td>';
+                html += '<td style="text-align:center;">'
+                    + '<span style="background:' + stBg + '; color:' + stColor
+                    + '; padding:3px 12px; border-radius:10px; font-size:12px;">'
+                    + stLabel + '</span></td>';
+                html += '</tr></tfoot></table>';
+
+                $('#paymentHistoryBody').html(html);
+            },
+            error: function () {
+                $('#paymentHistoryBody').html(
+                    '<p class="text-danger text-center">Server error. Please try again.</p>'
+                );
+            }
+        });
+    }
+
+    function PrintLabPackage() {
+        if (!$('#Tblreportprint').find('tr').length) { alert('Run the report first'); return; }
+
+        var $t = $('#Tblreportprint').clone().removeAttr('id').addClass('rpt');
+        $t.find('tr.pk-cont').each(function () {          // Detailed (Test): show Sl#, Reg# and package once per bill
+            $(this).children('td').slice(0, 3).html('');
+        });
+        $t.find('[onclick]').removeAttr('onclick').css('cursor', 'default');
+
+        var title = $('#header').text();
+
+        var logoEl = document.getElementById('ComapnyImage') || ComapnydivToPrint;
+        var logoHtml = logoEl ? logoEl.outerHTML : '';
+        var companyName = (window.CompanySettingsArray && window.CompanySettingsArray.CompanyName) || '';
+
+        var css = '@@page { size: landscape; margin: 10mm; }'
+            + 'body { font-family: Arial, sans-serif; font-size: 11px; }'
+            + 'img { max-width: 100%; }'
+            + '.hdr { width: 100%; font-size: 85%; border-collapse: collapse; }'
+            + '.hdr td { text-align: center; }'
+            + '.ttl { width: 100%; height: 50px; margin-top: 10px; margin-bottom: 10px; font-size: 85%; border: 1px solid #000; border-collapse: collapse; }'
+            + '.ttl td { text-align: center; }'
+            + '.rpt { width: 100%; border-collapse: collapse; }'
+            + '.rpt th, .rpt td { border: 1px solid #444; padding: 3px 5px; text-align: left; }'
+            + '.rpt th { background: #eee; }'
+            + '.rpt td[align=right], .rpt th[style*=right] { text-align: right; }'
+            + '.rpt td[align=center] { text-align: center; }'
+            + '.paid-badge, .pending-badge { font-weight: bold; }'
+            + '.rpt thead { display: table-header-group; } .rpt tr { page-break-inside: avoid; }';
+
+        // Separate popup window (same call style as PrintthisLabBillReport)
+        var w = window.open('', '', 'width=1500,height=1500');
+        if (!w) { alert('Popup blocked. Please allow popups for this site.'); return; }
+        w.document.write('<html><head><title>' + title + '</title><style>' + css + '</style></head><body>'
+            + '<table class="hdr"><tr><td>' + logoHtml + '</td></tr>'
+            + '<tr><td>' + companyName + '</td></tr></table>'
+            + '<table class="ttl"><tr><td>' + title + '</td></tr></table>'
+            + $t[0].outerHTML
+            + '</body></html>');
+        w.document.close();
+        w.focus();
+        setTimeout(function () { w.print(); }, 300);
+    }
+</script>
+
+
+
+
+
+

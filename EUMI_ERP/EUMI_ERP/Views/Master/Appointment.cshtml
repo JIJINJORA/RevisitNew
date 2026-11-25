@@ -1,0 +1,1543 @@
+﻿@{
+
+    Layout = null;
+}
+
+
+<html lang="en">
+@*--DHINESH111*@
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment Booking</title>
+    <!-- Load Tailwind CSS -->
+    <script src="../Scripts/Appoinmentscripts/tailwindcss.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Load Font Awesome for Icons -->
+    <link rel="stylesheet" href="../Scripts/Appoinmentscripts/allmin.css">
+    <!-- Load jQuery for AJAX -->
+    @*<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>*@
+    <script type="text/javascript" src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <!-- Load SweetAlert2 -->
+    <script src="../Scripts/Appoinmentscripts/sweet.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="/Scripts/Autocomplete/autocomplete.css" />
+
+    <style>
+        /* Custom styles to match the system view aesthetic */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+        }
+
+        .app-header {
+            background-color: #362a64;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #00bcd4;
+            transition: background-color 0.15s ease;
+        }
+
+            .btn-primary:hover {
+                background-color: #00a8bb;
+            }
+
+        .main-content-card {
+            position: relative;
+            z-index: 10;
+        }
+
+        .day-picker::-webkit-scrollbar {
+            display: none;
+        }
+
+        .day-picker {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        .shadow-soft {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px 0 rgba(0, 0, 0, 0.02);
+        }
+
+        .selected-day {
+            background-color: #00bcd4;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 188, 212, 0.3);
+        }
+
+        .selected-slot {
+            background-color: #362a64;
+            color: white;
+            border-color: #362a64;
+            box-shadow: 0 4px 6px -1px rgba(54, 42, 100, 0.3);
+        }
+
+        .booked-slot {
+            position: relative;
+            background-color: #f3f4f6;
+            color: #9ca3af;
+            border-color: #e5e7eb;
+            cursor: default;
+            text-decoration: line-through;
+        }
+
+        .border-00bcd4 {
+            border-color: #00bcd4;
+        }
+
+        .text-00bcd4 {
+            color: #00bcd4;
+        }
+
+        /* Tooltip CSS */
+        .custom-tooltip-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .custom-tooltip {
+            visibility: hidden;
+            width: 220px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 8px;
+            padding: 12px;
+            position: absolute;
+            z-index: 50;
+            bottom: 110%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+            text-decoration: none;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+            .custom-tooltip::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #1f2937 transparent transparent transparent;
+            }
+
+        .booked-slot:hover .custom-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Table Styles for Listing */
+        #tblAppointment {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+            #tblAppointment thead th {
+                background-color: #f3f4f6;
+                color: #374151;
+                font-weight: 700;
+                padding: 12px;
+                text-align: left;
+                border-bottom: 2px solid #e5e7eb;
+            }
+
+            #tblAppointment tbody td {
+                padding: 12px;
+                border-bottom: 1px solid #e5e7eb;
+                color: #4b5563;
+            }
+
+            #tblAppointment tbody tr:hover {
+                background-color: #f9fafb;
+            }
+    </style>
+
+
+
+
+
+    <style>
+        .ui-autocomplete .ui-menu-item .ui-state-active.tblautocomplete td::before {
+            content: attr(data-em-header);
+            font-style: italic;
+            font-size: 11px;
+            line-height: 11px;
+            display: block;
+            margin: 0;
+            margin-bottom: -4px;
+            padding: 2px;
+            /* background-color: #322e87;*/
+        }
+
+        .ui-autocomplete {
+            z-index: 30000;
+        }
+
+        .tblautocomplete {
+            table-layout: fixed;
+            font-weight: bold;
+        }
+
+            .tblautocomplete td {
+                overflow: hidden;
+            }
+
+        /* Fix SweetAlert2 Z-Index to appear above the modal */
+        .swal2-container {
+            z-index: 20000 !important;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <!-- 1. FIXED HEADER -->
+    <header class="app-header text-white p-4 flex justify-between items-center z-20 sticky top-0">
+        <div class="flex items-center space-x-4">
+            <i class="fas fa-stethoscope text-2xl"></i>
+            <h1 class="text-xl font-semibold">Appointment Scheduling System</h1>
+        </div>
+        <div class="flex items-center space-x-4">
+            <button onclick="ShowCalendarView()" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition">
+                Back to Calendar
+            </button>
+            <button onclick="GetRows(0)" class="text-xs bg-white/10 hover:bg-white/20 px-3 py-1 rounded transition">
+                <i class="fas fa-list-alt mr-1"></i> List
+            </button>
+            <div class="text-xs text-right opacity-80 leading-tight">
+                <span class="block font-medium">User:</span>
+                <span id="displayUserId" class="font-mono text-[10px]">System Admin</span>
+            </div>
+            <i class="fas fa-user-circle text-2xl"></i>
+        </div>
+    </header>
+
+    <!-- 2. MAIN CONTENT WRAPPER -->
+    <main class="flex-grow">
+
+        <!-- A. CALENDAR VIEW (Default) -->
+        <div id="calendar-view"
+             class="main-content-card bg-white p-6 rounded-xl shadow-lg mx-auto mt-6 mb-8 w-[80%] max-w-none">
+            <!-- Doctor Selection Section -->
+            <section class="mt-4 mb-6 border-b border-gray-100 pb-4">
+                <h2 class="text-xl font-bold text-gray-800 mb-3">Select a Specialist</h2>
+                <div class="relative">
+                    <button id="scrollLeftBtnDoctor"
+                            class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white transition hidden md:block border border-gray-100">
+                        <span style="font-weight: bold; font-size: 20px;"><</span>
+                    </button>
+                    <div id="doctorSelection" class="flex overflow-x-scroll space-x-6 pb-6 items-start">
+                        <!-- Doctors will be loaded here via AJAX -->
+                        <div class="p-4 text-gray-500 italic">Loading specialists...</div>
+                    </div>
+                    <button id="scrollRightBtnDoctor"
+                            class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white transition hidden md:block border border-gray-100">
+                        <span style="font-weight: bold; font-size: 20px;">></span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- DATE & TIME CONTAINER -->
+            <div class="space-y-8">
+                <!-- Section 1: MONTH & DAY SELECTION -->
+                <section>
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Choose Date</h2>
+                    <div class="flex justify-between items-center mb-4">
+                        <button id="prevMonthBtn" class="p-2 rounded-full hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <h3 id="currentMonthDisplay" class="text-xl font-extrabold text-gray-800 tracking-wider"></h3>
+                        <button id="nextMonthBtn" class="p-2 rounded-full hover:bg-gray-100 text-gray-700">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="relative">
+                        <button id="scrollLeftBtn"
+                                class="absolute left-0 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white transition hidden md:block border border-gray-100">
+                            <span style="font-weight: bold; font-size: 25px;"><</span>
+                        </button>
+                        <div id="dayPicker" class="day-picker flex overflow-x-scroll space-x-4 pb-4 border-t pt-4 border-gray-100">
+                        </div>
+                        <button id="scrollRightBtn"
+                                class="absolute right-0 top-1/2 -translate-y-1/2 bg-white/70 backdrop-blur-sm p-2 rounded-full shadow-lg z-10 hover:bg-white transition hidden md:block border border-gray-100">
+                            <span style="font-weight: bold; font-size: 25px;">></span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Section 2: TIME SLOT SELECTION -->
+                <section id="timeSlotsSection">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4">Available Times</h2>
+                    <div class="mb-4">
+                        <label for="slotDuration" class="block text-sm font-medium text-gray-700 mb-2">Slot Duration (Mins)</label>
+                        <select id="slotDuration"
+                                class="mt-1 block w-full px-3 py-2 border border-gray-300 bg-gray-50 rounded-lg shadow-sm outline-none cursor-not-allowed"
+                                disabled>
+                            <option value="10">10 Minutes</option>
+                            <option value="15" selected>15 Minutes</option>
+                            <option value="20">20 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                        </select>
+                    </div>
+                    <div id="timeSlotsContainer">
+                        <p class="text-gray-500">Please select a date to view available time slots.</p>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- B. LISTING VIEW (Hidden by default) -->
+        <div id="listing" class="hidden bg-white p-6 rounded-xl shadow-lg mx-auto mt-6 mb-8 w-[95%] max-w-none">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Booked Appointments</h2>
+                <button onclick="ShowCalendarView()"
+                        class="btn-primary text-white px-4 py-2 rounded-lg shadow-soft font-bold text-sm">
+                    <i class="fas fa-plus mr-2"></i>New Booking
+                </button>
+                <button onclick="openSearchModal()"
+                        class="ml-3 btn-primary text-white px-4 py-2 rounded-lg shadow-soft font-bold text-sm bg-purple-700 hover:bg-purple-800 transition">
+                    <i class="fas fa-search mr-2"></i>Searching
+                </button>
+            </div>
+            <div class="overflow-x-auto">
+                <table id="tblAppointment" class="w-full">
+                    <!-- Table content injected via JS -->
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+
+
+    <!-- 6. NEW PATIENT INFORMATION MODAL (Acts as #Entry) -->
+    <div id="patient-modal" class="fixed inset-0 z-[9999] hidden" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black bg-opacity-40 transition-opacity" onclick="closePatientModal()"></div>
+
+        <!-- Modal Positioning Wrapper -->
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+
+                <!-- MODAL CONTENT CARD -->
+                <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-[80%] flex flex-col max-h-[85vh]"
+                     id="patient-modal-content">
+
+                    <!-- HEADER -->
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-900 text-white flex-shrink-0">
+                        <div>
+                            <h2 class="text-xl font-extrabold tracking-wide">Appointment Details</h2>
+                            <p class="text-xs font-bold text-indigo-200 mt-1" id="patient-slot-info">Edit Entry</p>
+                        </div>
+                        <button onclick="closePatientModal()" class="text-indigo-200 hover:text-white transition">
+                            <i class="fas fa-times text-2xl font-bold"></i>
+                        </button>
+                    </div>
+
+                    <!-- BODY (Scrollable) -->
+                    <div class="p-6 overflow-y-auto bg-gray-50 flex-1">
+                        <form id="patient-form" onsubmit="event.preventDefault(); submitPatientDetails();">
+                            <input type="hidden" id="AppointmentId" value="0">
+                            <div class="card bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+                                <!-- Form fields -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            First Name <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="AppFirst" required
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Existing OP</label>
+                                        <input type="text" id="AppLast"
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            Gender <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="PGender"
+                                                class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            <option value="0">Select</option>
+                                            <option value="1">Male</option>
+                                            <option value="2">Female</option>
+                                            <option value="3">Others</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            Contact No <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="tel" id="MobileNo" required
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Age</label>
+                                        <div class="md:w-2/3 w-full flex gap-2">
+                                            <input type="number" id="Age" placeholder="YR"
+                                                   class="w-1/3 rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                            <input type="number" id="Age1" placeholder="MO"
+                                                   class="w-1/3 rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                            <input type="number" id="Age2" placeholder="DA"
+                                                   class="w-1/3 rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Email</label>
+                                        <input type="email" id="EmailId"
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">DOB</label>
+                                        <input type="text" id="PDOB" placeholder="dd/mm/yyyy" onchange="GetPatientAge()"
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            Nationality <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="Country"
+                                                class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 bg-white focus:ring-2 focus:ring-indigo-500 outline-none">
+                                            <option>India</option>
+                                            <option>USA</option>
+                                            <option>UK</option>
+                                            <option>Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <hr class="border-gray-200 my-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Department</label>
+                                        <select id="txt_docdeptname"
+                                                class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 bg-white outline-none">
+                                            <option>General</option>
+                                            <option>Cardiology</option>
+                                            <option>Neurology</option>
+                                            <option>Pediatrics</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            Token No <span class="text-red-500">*</span>
+                                        </label>
+                                        <input type="text" id="Branch"
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 outline-none">
+                                    </div>
+                                </div>
+                                <hr class="border-gray-200 my-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">
+                                            Doctor <span class="text-red-500">*</span>
+                                        </label>
+                                        <select id="Doctor"
+                                                class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 bg-gray-100 focus:ring-2 focus:ring-indigo-500 outline-none"></select>
+                                    </div>
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Appt Date</label>
+                                        <input type="text" id="PDATE" readonly
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-600 bg-gray-100 outline-none">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-4">
+                                    <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                        <label class="md:w-1/3 text-sm font-extrabold text-gray-700">Appt Time</label>
+                                        <input type="text" id="PTime" readonly
+                                               class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-600 bg-gray-100 outline-none">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- FOOTER (Fixed) -->
+                    <div class="p-6 border-t border-gray-200 bg-gray-100 flex justify-end gap-3 flex-shrink-0">
+                        <button type="button" onclick="closePatientModal()"
+                                class="px-5 py-2.5 bg-white border border-gray-300 text-gray-700 font-extrabold rounded-lg hover:bg-gray-50 transition shadow-sm">
+                            <i class="fas fa-times mr-2"></i> Cancel
+                        </button>
+                        <button disabled type="button" onclick="document.getElementById('patient-form').reset()"
+                                class="px-5 py-2.5 bg-yellow-500 text-white font-extrabold rounded-lg hover:bg-yellow-600 transition shadow-sm">
+                            <i class="fas fa-sync-alt mr-2"></i> Clear
+                        </button>
+                        <button id="saveBtn" onclick="submitPatientDetails(1)"
+                                class="px-6 py-2.5 bg-indigo-900 text-white font-extrabold rounded-lg hover:bg-indigo-800 transition shadow-md">
+                            <i class="fas fa-save mr-2"></i> Save Booking
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 7. SEARCH OPTIONS MODAL -->
+    <div id="search-modal" class="fixed inset-0 z-[20005] hidden" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-black bg-opacity-40 transition-opacity" onclick="closeSearchModal()"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 w-[66%] flex flex-col">
+
+                    <!-- Header -->
+                    <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-indigo-900 text-white flex-shrink-0">
+                        <h3 class="text-xl font-extrabold tracking-wide">Search Options</h3>
+                        <button onclick="closeSearchModal()" class="text-indigo-200 hover:text-white transition">
+                            <span aria-hidden="true" class="text-2xl font-bold">×</span>
+                        </button>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-8 bg-gray-50">
+                        <div class="card bg-white p-6 rounded-2xl shadow-sm border border-gray-200">
+
+                            <!-- Row 1: Doctor and From Date (Same Position) -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- Doctor Selection -->
+                                <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                    <label class="md:w-1/3 text-sm font-extrabold text-gray-700 text-right pr-4">Doctor</label>
+                                    <select id="DoctorSearchId"
+                                            class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 bg-gray-50 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                        <option value="0">Select</option>
+                                    </select>
+                                </div>
+
+                                <!-- From Date -->
+                                <div class="flex flex-col md:flex-row md:items-center gap-2">
+                                    <label class="md:w-1/3 text-sm font-extrabold text-gray-700 text-right pr-4">From</label>
+                                    <input type="text" id="FromDate" placeholder="dd/mm/yyyy"
+                                           class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                </div>
+                            </div>
+
+                            <!-- Row 2: To Date -->
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                <!-- To Date (Aligned with From Date column visually if needed, or just standard grid) -->
+                                <div class="flex flex-col md:flex-row md:items-center gap-2 md:col-start-2">
+                                    <label class="md:w-1/3 text-sm font-extrabold text-gray-700 text-right pr-4">To</label>
+                                    <input type="text" id="ToDate" placeholder="dd/mm/yyyy"
+                                           class="md:w-2/3 w-full rounded-lg border border-gray-300 p-2 text-sm font-bold text-gray-800 focus:ring-2 focus:ring-indigo-500 outline-none">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="p-6 border-t border-gray-200 bg-gray-100 flex justify-center">
+                        <button type="button" onclick="AppointmentSearchList()"
+                                class="px-8 py-3 bg-indigo-900 text-white font-extrabold rounded-lg hover:bg-indigo-800 transition shadow-md flex items-center">
+                            Go <i class="fas fa-search ml-2"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div style="display:none">
+        <input type="text" id="AppointmentId" class="form-control" />
+        <input type="text" id="RegId" class="form-control" />
+        <input type="text" id="AppLastId" class="form-control" />
+
+    </div>
+
+    <script src="/Scripts/Autocomplete/jquery-ui.js"></script>
+    <script>
+
+
+
+        $("#AppLast").autocomplete({
+            delay: 0,
+            minLength: 0,
+            source: function (request, response) {
+                var data = {};
+                //data.PatientName = $("#AppLast").val();
+                //data.DeptId = ERPDeptId;
+
+                //$.ajax({
+                //    url: '../Revisit/HMS_PatientSearchAppointment',
+
+                data.PatientName = $("#AppLast").val();
+                data.DeptId = 1;
+
+                $.ajax({
+                    url: '../Revisit/HMS_PatientSearch',
+                    type: "POST",
+                    data: data,
+                    dataType: "json",
+                    success: function (data) {
+                        response($.map(data, function (item) {
+
+                            return ({
+                                ColCount: '3R',
+                                label: item.OPSerName + '-' + item.OPNumber,
+                                label1: item.PatientName,
+                                label2: item.Contact,
+                                PatientId: item.PatientId,
+                                DOB: item.DOB,
+                                Contact: item.Contact,
+                                OPNumber: item.OPNumber,
+                                PatientName: item.PatientName,
+                                Gender: item.Gender,
+                                Age: item.Age,
+                                headers: ["RegNo", "Patient", "Mobile"]
+                            })
+                        }));
+                    }
+
+                })
+            },
+            autoFocus: true,
+            select: function (event, ui) {
+                var gender = 0;
+                $('#AppFirst').val(ui.item.PatientName);
+                $('#PDOB').val(ui.item.DOB);
+                $('#MobileNo').val(ui.item.Contact);
+
+                if (ui.item.Gender == 'Male') {
+                    gender = 1;
+                }
+                else if (ui.item.Gender == 'Female') {
+                    gender = 2;
+                }
+                else if (ui.item.Gender == 'Others') {
+                    gender = 3;
+                }
+
+                $('#PGender').val(gender);
+                $('#AppLast').val(ui.item.OPNumber);
+                $('#Age').val(ui.item.Age);
+            },
+
+        });
+
+
+
+        function submitPatientDetails(Flag) {
+            debugger;
+
+            if ($('#AppFirst').val() == "") {
+                warningshow('Please Enter First Name', 'AppFirst');
+            }
+
+
+            else if (($('#Doctor').val() || 0) == 0) {
+                warningshow('Please Select Doctor ', 'Doctor');
+
+            }
+            else if (($('#PGender').val() || 0) == 0) {
+                warningshow('Please Select Gender', 'PGender');
+            }
+            else if (($('#Country').val() || 0) == 0) {
+                warningshow('Please Select Nationality', 'Country');
+            }
+            else if ($('#MobileNo').val() == "") {
+                warningshow('Please Enter Contact Number', 'MobileNo');
+            }
+
+            else {
+                $('#btnsubmit').prop('disabled', true);
+                var sts;
+                var yess;
+                if ($('#self').prop("checked")) {
+                    sts = 0;
+                }
+                else if ($('#insurance').prop("checked")) {
+                    sts = 1;
+                }
+                if ($('#yes').prop("checked")) {
+                    yess = 0;
+                }
+                else if ($('#no').prop("checked")) {
+                    yess = 1;
+                }
+
+                var data = {};   //array
+                data.AppointmentId = $('#AppointmentId').val();
+                data.FirstName = $.trim($('#AppFirst').val());
+                data.LastName = $.trim($('#AppLast').val());
+                data.DOB = formatDateToInternal($('#PDOB').val());
+                data.Age = parseInt($('#Age').val());
+                data.Gender = $('#PGender').val();
+                data.Nationality = $.trim($('#Country').val());
+                data.Contact = $.trim($('#MobileNo').val());
+                data.Email = $.trim($('#EmailId').val());
+                data.Branch = $.trim($('#Branch').val());
+                data.Department = $.trim($('#txt_docdeptname').val());
+                data.Doctor = $.trim($('#Doctor').val());
+                data.AppointmentDate = $.trim($('#PDATE').val());
+                data.AppointmentTime = $.trim($('#PTime').val());
+                data.Status1 = sts;
+                data.Status2 = yess;
+
+                data.DelFlag = Flag;
+
+                console.log(data)
+                $.ajax({
+                    type: "POST",
+                    url: "../Master/AppointmentInsertandUpdate",
+                    data: data,
+                    success: function (result) {
+
+                        var status = result.oList[0].Status;
+                        $('#btnsubmitapp').prop('disabled', false);
+                        Showalertsnew(status);
+
+                    }
+                });
+
+            }
+
+
+        }
+
+
+    </script>
+
+    <script>
+        // State variables
+        let bookings = [
+            // Dummy Data to ensure List View isn't empty initially
+            //{ AppointmentId: 101, FirstName: 'John', LastName: 'Doe', DOB: '1985-05-15', Age: 38, Gender: 1, Nationality: 'USA', Contact: '555-0101', Email: 'john@example.com', Department: 'General', Branch: 'T-101', DoctorId: 1, Doctor: 'Dr. Jane Smith', AppointmentDate: '2023-11-01', AppointmentTime: '09:00 AM' },
+            //{ AppointmentId: 102, FirstName: 'Sarah', LastName: 'Connor', DOB: '1990-08-20', Age: 33, Gender: 2, Nationality: 'UK', Contact: '555-0202', Email: 'sarah@example.com', Department: 'Cardiology', Branch: 'T-102', DoctorId: 3, Doctor: 'Dr. Emily Lee', AppointmentDate: '2023-11-02', AppointmentTime: '10:30 AM' }
+        ];
+
+        let MOCK_DOCTORS = []; // Data will be loaded from Server or Fallback
+
+        // STATIC MOCK DATA FOR FALLBACK (Standalone Mode)
+        const STATIC_MOCK_DOCTORS = [
+            { id: 1, name: 'Dr. DEMO-1', shortName: 'Smith', initials: 'JS', specialty: 'Pediatrician', fee: 199, color: '8863D4', availableDays: [5, 6, 0, 1, 2, 3, 4], slotDuration: 20 },
+            { id: 2, name: 'Dr. DEMO-2', shortName: 'Jones', initials: 'JJ', specialty: 'Dermatologist', fee: 150, color: 'DC2626', availableDays: [1, 2, 3], slotDuration: 10 },
+            { id: 3, name: 'Dr. DEMO-3', shortName: 'Lee', initials: 'EL', specialty: 'Cardiologist', fee: 250, color: '059669', availableDays: [2, 4], slotDuration: 30 },
+            { id: 4, name: 'Dr. DEMO-4', shortName: 'Khan', initials: 'AK', specialty: 'General P.', fee: 120, color: 'F97316', availableDays: [1, 2, 3, 4, 5], slotDuration: 15 },
+            { id: 5, name: 'Dr. DEMO-5', shortName: 'Patel', initials: 'PP', specialty: 'Orthopedic', fee: 210, color: '3B82F6', availableDays: [6, 0], slotDuration: 20 },
+            { id: 6, name: 'Dr. DEMO-6', shortName: 'Chen', initials: 'DC', specialty: 'Neurologist', fee: 230, color: 'FACC15', availableDays: [1, 2, 3, 4], slotDuration: 30 },
+            { id: 7, name: 'Dr. DEMO-7', shortName: 'Wong', initials: 'LW', specialty: 'Ophthalmologist', fee: 180, color: '6B21A8', availableDays: [3], slotDuration: 15 },
+            { id: 8, name: 'Dr. DEMO-8', shortName: 'Ali', initials: 'OA', specialty: 'Urologist', fee: 200, color: '14B8A6', availableDays: [2, 4, 5], slotDuration: 10 },
+        ];
+
+        let selectedDay = null;
+        let selectedTime = null;
+        let selectedDoctor = null;
+        const today = new Date();
+        const shortDaysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        let slotDurationMinutes = 15; // Default
+
+        // --- HELPER FUNCTIONS FOR DATE FORMATTING ---
+        function formatDateToDisplay(yyyyMmDd) {
+            if (!yyyyMmDd) return "";
+            const parts = yyyyMmDd.split('-');
+            if (parts.length !== 3) return yyyyMmDd;
+            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        function formatDateToInternal(ddMmYyyy) {
+            if (!ddMmYyyy) return "";
+            const parts = ddMmYyyy.split('/');
+            if (parts.length !== 3) return ddMmYyyy;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        let currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+        // Defines EditButton icon
+        var Editbutton = '<button class="text-blue-600 hover:text-blue-800 transition"><i class="fas fa-edit"></i></button>';
+
+        // Dummy functions to prevent crashes from provided user code
+        function disable_datatable(id) { /* console.log('Datatable disabled'); */ }
+        function datatableWithsearch1(id) { /* console.log('Datatable enabled'); */ }
+
+
+        // --- USER PROVIDED FUNCTIONS (ADAPTED) ---
+
+        function GetRows(AppointmentId) {
+            $('#AppointmentId').val(AppointmentId);
+            var data = {};
+            data.AppointmentId = AppointmentId;
+
+            console.log("Fetching rows for ID:", AppointmentId);
+
+            // --- SIMULATION BLOCK START ---
+            // Simulating AJAX Success since backend is unreachable in this preview environment
+            // Check if we are in simulation mode (always true here)
+            const isSimulation = false;
+
+            if (isSimulation) {
+                // Mock Result Structure
+                let result = { oList: [] };
+
+                if (AppointmentId == 0) {
+                    // Return all bookings
+                    result.oList = bookings;
+                    console.log("Simulating List Fetch:", result.oList);
+                    ShowTermlist(result.oList);
+                } else {
+                    // Return specific booking
+                    const specific = bookings.filter(b => b.AppointmentId == AppointmentId);
+                    result.oList = specific;
+                    console.log("Simulating specific Fetch:", result.oList);
+                    ShowTermGet(result.oList);
+                }
+                return; // Stop here to prevent actual AJAX failure
+            }
+            // --- SIMULATION BLOCK END ---
+
+            $.ajax({
+                type: "POST",
+                url: "../Master/AppointmentGetandGets",
+                data: data,
+                success: function (result) {
+                    console.log(result);
+                    if (AppointmentId == 0)
+                        ShowTermlist(result.oList);
+                    else
+                        ShowTermGet(result.oList);
+                },
+                error: function (err) {
+                    console.error("AJAX Error (Likely missing backend):", err);
+                }
+            });
+        }
+
+        function ShowTermlist(result) {
+            $('#calendar-view').hide(); // Hide Calendar View (Mapped #Entry to Calendar view for toggle logic)
+            $('#listing').show(); // Show Listing
+            $('#viewListBtn').hide(); // Hide the footer button when in list view
+
+            disable_datatable('tblAppointment');
+
+            // Added Tailwind classes to the headers and cells in the loop for better UI
+            var responseText = "<thead><tr><th width=1% align=center>Sl#</th><th width=4% >RegId</th><th width=20%>Name</th><th width=10%>OP</th><th width=15% class='text-left' >Doctor</th><th width=15%>Date</th><th width=10%>Time</th><th width=10% class='text-left' >Mobile No:</th><th width=10% class='text-left' >Token No:</th><th width=3%>Edit</th></tr></thead><tbody>";
+
+            if (!result || result.length === 0) {
+                responseText += "<tr><td colspan='10' class='text-center p-4'>No bookings found.</td></tr>";
+            } else {
+                for (var i = 0; i < result.length; i++) {
+                    var slno = parseInt(i + 1);
+                    // Safe checks for properties
+                    var id = result[i].AppointmentId || '';
+                    var fname = result[i].FirstName || '';
+                    var lname = result[i].LastName || '';
+                    var doc = result[i].Doctor || 'Unknown';
+                    var date = result[i].AppointmentDate || '';
+                    var time = result[i].AppointmentTime || '';
+                    var contact = result[i].Contact || '';
+                    var branch = result[i].Branch || '';
+
+                    responseText += '<tr><td align=center>' + slno + '</td><td>' + id + '</td><td>' + fname + '</td><td>' + lname + '</td><td align=left>' + doc + '</td><td align=left>' + date + '</td><td align=left>' + time + '</td><td align=left>' + contact + '</td> <td align=left>' + branch + '</td>   <td onclick="GetRows(' + id + ')" align=center width=10px class="cursor-pointer hover:bg-gray-100 rounded">' + Editbutton + '</td></tr>';
+                }
+            }
+            $('#tblAppointment').html(responseText + '</tbody>');
+            datatableWithsearch1('tblAppointment');
+        }
+
+        function ShowTermGet(result) {
+            // debugger;
+            // In this logic, 'Entry' refers to the Form.
+            // Since the form is in a Modal, we populate fields then Show the Modal.
+
+            if (!result || result.length === 0) return;
+
+            var data = result[0]; // Assuming list of 1
+
+            $('#AppointmentId').val(data.AppointmentId);
+            $('#AppFirst').val(data.FirstName);
+            $('#AppLast').val(data.LastName);
+            $('#PDOB').val(formatDateToDisplay(data.DOB));
+            $('#Age').val(data.Age);
+            $('#txt_docdeptname').val(data.Department);
+            $('#PGender').val(data.Gender);
+            $('#EmailId').val(data.Email);
+            $('#Country').val(data.Nationality);
+            $('#MobileNo').val(data.Contact);
+            $('#Branch').val(data.Branch);
+
+            // Handle Doctor Select (Enable temporarily to set value)
+            $('#Doctor').prop('disabled', false).val(data.DoctorId);
+
+            $('#PTime').val(data.AppointmentTime);
+            $('#PTime').val(data.AppointmentTime);
+            $('#PDATE').val(formatDateToDisplay(data.AppointmentDate));
+
+            // Show the modal (Which acts as '#Entry')
+            $('#patient-slot-info').text("Edit Appointment ID: " + data.AppointmentId);
+            $('#saveBtn').html('<i class="fas fa-save mr-2"></i> Update'); // Change button text
+
+            showPatientModal();
+
+            // Logic from user code:
+            // $('#Entry').show();
+            // $('#listing').hide();
+            // $('#btndelete').show();
+        }
+
+        // New Helper to toggle back to calendar
+        function ShowCalendarView() {
+            $('#listing').hide();
+            $('#calendar-view').show();
+            $('#viewListBtn').show();
+        }
+
+        // --- EXISTING LOGIC BELOW ---
+
+        // --- LOAD DOCTORS FROM SERVER ---
+        function Doctorload() {
+            MOCK_DOCTORS = [];
+            var data = {};
+            data.DoctorsId = 0;
+
+            document.getElementById('doctorSelection').innerHTML = '<div class="p-4 text-gray-500 italic">Loading specialists...</div>';
+
+            $.ajax({
+                type: "POST",
+                url: "/Master/DoctorGetandGets",
+                data: data,
+                success: function (result) {
+                    if (result && result.oList && result.oList.length > 0) {
+                        MOCK_DOCTORS = result.oList.map(doc => ({
+                            id: doc.DoctorsId,
+                            name: doc.Name,
+                            shortName: doc.Name,
+                            initials: 'DR',
+                            specialty: doc.Department,
+                            fee: doc.Consultancy,
+                            color: '8863D4',
+                            availableDays: [0, 1, 2, 3, 4, 5, 6],
+                            slotDuration: 15
+                        }));
+                        initAppWithData();
+                    } else {
+                        useFallbackData();
+                    }
+                },
+                error: function (err) {
+                    useFallbackData();
+                }
+            });
+        }
+
+        function useFallbackData() {
+            MOCK_DOCTORS = STATIC_MOCK_DOCTORS;
+            initAppWithData();
+        }
+
+        function initAppWithData() {
+            if (MOCK_DOCTORS.length > 0) {
+                selectedDoctor = MOCK_DOCTORS[0].id;
+                slotDurationMinutes = MOCK_DOCTORS[0].slotDuration;
+                document.getElementById('slotDuration').value = slotDurationMinutes;
+                renderDoctors();
+                generateDays();
+            } else {
+                document.getElementById('doctorSelection').innerHTML = '<div class="p-4 text-red-500">No doctors available.</div>';
+            }
+        }
+
+        function fetchBookedSlots() {
+            if (!selectedDoctor || !selectedDay) return;
+            // Simple filter of local bookings array for visualization
+            renderTimeSlots();
+        }
+
+        function warningshow(msg, id) {
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'warning',
+                title: msg,
+                showConfirmButton: false,
+                timer: 3000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    const el = document.getElementById(id);
+                    if (el) el.focus();
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            });
+        }
+
+        function Showalertsnew(status) {
+            if (status === 'Success' || status === 'Saved' || status === true || status == 1) {
+                const docName = $('#Doctor option:selected').text();
+                const appDate = $('#PDATE').val();
+                const appTime = $('#PTime').val();
+                const successMessage = `Booking confirmed as ${docName} with ${appDate} ${appTime}`;
+                // Add to list if not exists for demo
+                const newId = $('#AppointmentId').val() == "0" ? Math.floor(Math.random() * 1000) : $('#AppointmentId').val();
+
+                // Demo: Update local booking array
+                const newBooking = {
+                    AppointmentId: newId,
+                    FirstName: $('#AppFirst').val(),
+                    LastName: $('#AppLast').val(),
+                    Doctor: $('#Doctor option:selected').text(),
+                    DoctorId: $('#Doctor').val(),
+                    DoctorId: $('#Doctor').val(),
+                    AppointmentDate: formatDateToInternal($('#PDATE').val()),
+                    AppointmentTime: $('#PTime').val(),
+                    AppointmentTime: $('#PTime').val(),
+                    Contact: $('#MobileNo').val(),
+                    Branch: $('#Branch').val(),
+                    Department: $('#txt_docdeptname').val(),
+                    Nationality: $('#Country').val(),
+                    Email: $('#EmailId').val(),
+                    Gender: $('#PGender').val(),
+                    DOB: $('#PDOB').val(),
+                    Age: $('#Age').val()
+                };
+
+                // Remove existing if update
+                // Remove existing if update
+                bookings = bookings.filter(b => b.AppointmentId != newId);
+                bookings.push(newBooking);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Booking Confirmed!',
+                    text: successMessage,
+                    confirmButtonColor: '#00bcd4'
+                }).then(() => {
+                    closePatientModal();
+
+                    // If we were in list view, refresh it
+                    if ($('#listing').is(':visible')) {
+                        ShowTermlist(bookings);
+                    } else {
+                        // Reset to default state: Deselect Day/Time and Scroll to Top
+                        selectedDay = null;
+                        selectedTime = null;
+
+                        // Refresh visuals
+                        // 1. Clear day highlighting
+                        // 2. Clear slots ("Please select...")
+                        generateDays();
+                        renderTimeSlots();
+
+                        // Scroll to Doctor Selection (Top)
+                        document.getElementById('doctorSelection').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Status: ' + status,
+                    confirmButtonColor: '#d33'
+                });
+            }
+        }
+
+
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const day = date.getDate().toString().padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function GetPatientAge() {
+            const dobStr = document.getElementById('PDOB').value;
+            if (!dobStr) return;
+
+            // Parse dd/mm/yyyy
+            const parts = dobStr.split('/');
+            if (parts.length !== 3) return;
+
+            const day = parseInt(parts[0], 10);
+            const month = parseInt(parts[1], 10) - 1; // Months are 0-indexed
+            const year = parseInt(parts[2], 10);
+
+            const dob = new Date(year, month, day);
+            const today = new Date();
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const m = today.getMonth() - dob.getMonth();
+
+            // Adjust if birth month hasn't occurred yet this year
+            if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                age--;
+            }
+
+            if (age >= 0) {
+                document.getElementById('Age').value = age;
+            }
+        }
+
+        function isSlotBooked(doctorId, date, time) {
+            // Check in local bookings for visual feedback in calendar
+            return bookings.find(b => b.DoctorId == doctorId && b.AppointmentDate === date && b.AppointmentTime === time);
+        }
+
+        // Removed logic for disabling/enabling main button since we removed it
+        function updateBookingButtonState() { }
+
+        function generateSlots(durationMinutes) {
+            const slots = [];
+            const START_MINUTE = 8 * 60;
+            const END_MINUTE = 20 * 60;
+            for (let currentMinute = START_MINUTE; currentMinute < END_MINUTE; currentMinute += durationMinutes) {
+                const hour = Math.floor(currentMinute / 60);
+                const minute = currentMinute % 60;
+                const ampm = hour >= 12 ? 'PM' : 'AM';
+                const displayHour = hour % 12 === 0 ? 12 : hour % 12;
+                const timeString = `${displayHour}:${minute.toString().padStart(2, '0')} ${ampm}`;
+                let group = hour < 13 ? 'morning' : (hour < 17 ? 'afternoon' : 'evening');
+                slots.push({ time: timeString, group: group });
+            }
+            return slots;
+        }
+
+        function handleDoctorClick(event) {
+            document.querySelectorAll('.doctor-card').forEach(c => {
+                c.classList.remove('border-4', 'border-00bcd4', 'shadow-lg');
+                c.querySelector('.doctor-name').classList.remove('text-00bcd4');
+                c.classList.add('border-transparent');
+            });
+            const card = event.currentTarget;
+            card.classList.add('border-4', 'border-00bcd4', 'shadow-lg');
+            card.classList.remove('border-transparent');
+            card.querySelector('.doctor-name').classList.add('text-00bcd4');
+
+            const clickedId = card.dataset.id;
+            const docObj = MOCK_DOCTORS.find(d => d.id == clickedId);
+
+            if (docObj) {
+                selectedDoctor = docObj.id;
+                slotDurationMinutes = docObj.slotDuration || 15;
+                document.getElementById('slotDuration').value = slotDurationMinutes;
+            } else {
+                selectedDoctor = clickedId;
+            }
+
+            // Reset to current month to ensure date is current date when starting
+            currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            selectedDay = null;
+            selectedTime = null;
+            generateDays();
+            renderTimeSlots();
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+
+        function renderDoctors() {
+            const container = document.getElementById('doctorSelection');
+            container.innerHTML = '';
+            MOCK_DOCTORS.forEach((doctor) => {
+                const isSelected = doctor.id === selectedDoctor;
+                const doctorCard = document.createElement('div');
+                doctorCard.className = `doctor-card flex-shrink-0 w-40 flex flex-col items-center p-4 bg-white rounded-xl shadow-md cursor-pointer transition transform hover:scale-105 ${isSelected ? 'border-4 border-00bcd4 shadow-lg' : 'border-4 border-transparent'}`;
+                doctorCard.dataset.id = doctor.id;
+                doctorCard.addEventListener('click', handleDoctorClick);
+
+                doctorCard.innerHTML = `
+                                                                <img src="https://placehold.co/60x60/${doctor.color}/ffffff?text=${doctor.initials}" class="w-16 h-16 rounded-full object-cover mb-2 border-2 border-gray-100 flex-shrink-0">
+                                                                <p class="doctor-name text-sm font-semibold text-center break-words leading-tight w-full mb-1 ${isSelected ? 'text-00bcd4' : 'text-gray-800'}">${doctor.name}</p>
+                                                                <p class="text-xs text-gray-500 text-center">${doctor.specialty}</p>
+                                                            `;
+                container.appendChild(doctorCard);
+            });
+        }
+
+        function handleDayClick(event) {
+            if (event.currentTarget.disabled) return;
+            document.querySelectorAll('.day-slot').forEach(btn => {
+                if (!btn.disabled) {
+                    btn.classList.remove('selected-day', 'text-white');
+                    btn.classList.add('bg-white', 'text-gray-700');
+                }
+            });
+            const btn = event.currentTarget;
+            btn.classList.add('selected-day', 'text-white');
+            btn.classList.remove('bg-white', 'text-gray-700');
+            selectedDay = btn.dataset.date;
+            selectedTime = null;
+
+            // Call AJAX to get booked sessions for this doctor and day
+            GetBookedSession(selectedDoctor, selectedDay);
+        }
+
+        // New AJAX Function for Blocking
+        function GetBookedSession(doctorId, date) {
+            // Convert date to dd/mm/yyyy for backend call
+            const DisplayDate = formatDateToDisplay(date); // dd/mm/yyyy
+
+            var data = { DoctorId: doctorId, Date: DisplayDate };
+
+            $.ajax({
+                type: "POST", // or GET
+                url: "../Master/GetBookedSession",
+                data: data,
+                success: function (result) {
+
+
+                    // Assuming result is list of booked slots (e.g. ['09:00 AM', '10:15 AM'])
+                    let bookedTimes = [];
+
+                    if (result && result.oList && result.oList.length > 0) {
+                        bookedTimes = result.oList.map(item => item.AppointmentTime);
+                    }
+                    console.log(bookedTimes)
+                    debugger;
+
+                    //if (result && result.oList) {
+                    //    bookedTimes = result.oList.map(item => item.AppointmentTime);
+                    //} else if (Array.isArray(result)) {
+                    //    bookedTimes = result.map(item => item.AppointmentTime || item);
+                    //}
+
+                    renderTimeSlots(bookedTimes);
+                },
+                error: function (err) {
+                    console.warn("GetBookedSession failed (using local fallback)");
+                    // Fallback: Use local 'bookings' array
+                    const localBooked = bookings
+                        .filter(b => b.DoctorId == doctorId && b.AppointmentDate == DisplayDate)
+                        .map(b => b.AppointmentTime);
+
+                    console.log(localBooked)
+
+                    renderTimeSlots(localBooked);
+                }
+            });
+        }
+
+        function renderTimeSlots(bookedTimes = []) {
+
+            //dhinesh
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = '';
+
+            if (!selectedDay) {
+                container.innerHTML = `<p class="text-gray-500">Please select an available date.</p>`;
+                return;
+            }
+
+            const allSlots = generateSlots(slotDurationMinutes);
+            const groups = { morning: [], afternoon: [], evening: [] };
+            allSlots.forEach(s => groups[s.group] && groups[s.group].push(s.time));
+
+            ['morning', 'afternoon', 'evening'].forEach(key => {
+                if (groups[key].length === 0) return;
+
+                let html = `<div class="mb-4"><h3 class="text-lg font-semibold text-gray-800 mt-4 mb-3 capitalize">${key} Slots</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">`;
+
+                groups[key].forEach(time => {
+
+                    debugger;
+                    const isBooked = bookedTimes.includes(time);
+                    let className = 'time-slot bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-300 cursor-pointer';
+                    let tooltip = "";
+                    let disabledAttr = "";
+
+                    if (selectedTime === time) {
+                        className = 'time-slot selected-slot cursor-pointer';
+                    } else if (isBooked) {
+                        className = 'booked-slot custom-tooltip-container cursor-not-allowed';
+                        tooltip = '(Booked)';
+                        disabledAttr = "disabled";
+                    }
+
+                    if (isBooked) {
+                        html += `<button class="${className} text-sm font-medium py-3 rounded-xl border shadow-none flex items-center justify-center gap-1" ${disabledAttr}>${time} <i class="fas fa-lock text-xs opacity-50"></i></button>`;
+                    } else {
+                        html += `<button class="${className} text-sm font-medium py-3 rounded-xl border shadow-soft transition" data-time="${time}">${time}</button>`;
+                    }
+                });
+                html += `</div></div>`;
+                container.innerHTML += html;
+            });
+
+            // Re-attach listeners
+            document.querySelectorAll('.time-slot:not(:disabled)').forEach(btn => {
+                btn.onclick = (e) => {
+                    // ... copy existing handler logic if simpler, or call a named function
+                    document.querySelectorAll('.time-slot').forEach(b => {
+                        b.classList.remove('selected-slot');
+                        b.classList.add('bg-white', 'text-gray-700');
+                    });
+                    e.currentTarget.classList.add('selected-slot');
+                    e.currentTarget.classList.remove('bg-white', 'text-gray-700');
+                    selectedTime = e.currentTarget.dataset.time;
+
+                    // NEW FLOW: Open modal immediately for 'New' entry
+                    $('#AppointmentId').val(0);
+                    $('#patient-slot-info').text("New Appointment");
+                    $('#saveBtn').html('<i class="fas fa-save mr-2"></i> Save Booking');
+                    showPatientModal();
+                }
+            });
+        }
+
+        function generateDays() {
+            const dayPicker = document.getElementById('dayPicker');
+            dayPicker.innerHTML = '';
+            document.getElementById('currentMonthDisplay').textContent = currentMonth.toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+
+            const currentDoctor = MOCK_DOCTORS.find(d => d.id === selectedDoctor);
+            const doctorAvailableDays = currentDoctor ? currentDoctor.availableDays : [];
+            const displayStartDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+            if (currentMonth.getMonth() === today.getMonth()) displayStartDate.setDate(today.getDate());
+
+            const nextMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+            const displayEndDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0);
+
+            let currentDate = new Date(displayStartDate);
+            while (currentDate <= displayEndDate) {
+                const dateValue = formatDate(currentDate);
+                const dayIndex = currentDate.getDay();
+                const isDisabled = !doctorAvailableDays.includes(dayIndex);
+
+                const btn = document.createElement('button');
+                btn.className = `day-slot flex-shrink-0 w-20 h-24 flex flex-col justify-center items-center p-3 rounded-xl shadow-soft border transition duration-150 ease-in-out ${isDisabled ? 'bg-gray-100 text-gray-400 cursor-not-allowed opacity-50' : 'bg-white text-gray-700 hover:bg-gray-50'}`;
+                btn.dataset.date = dateValue;
+                if (isDisabled) btn.disabled = true;
+                else btn.addEventListener('click', handleDayClick);
+
+                btn.innerHTML = `<span class="text-base font-medium mb-1">${shortDaysOfWeek[dayIndex]}</span><span class="text-2xl font-bold">${currentDate.getDate()}</span>`;
+                dayPicker.appendChild(btn);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
+        function renderTimeSlots11111() {
+            const container = document.getElementById('timeSlotsContainer');
+            container.innerHTML = '';
+
+            if (!selectedDay) {
+                container.innerHTML = `<p class="text-gray-500">Please select an available date.</p>`;
+                return;
+            }
+
+            const allSlots = generateSlots(slotDurationMinutes);
+            const groups = { morning: [], afternoon: [], evening: [] };
+            allSlots.forEach(s => groups[s.group] && groups[s.group].push(s.time));
+
+            ['morning', 'afternoon', 'evening'].forEach(key => {
+                if (groups[key].length === 0) return;
+                // Updated grid to support 6 columns on large screens
+                let html = `<h3 class="text-lg font-semibold text-gray-800 mt-4 mb-3 capitalize">${key} Slots</h3><div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">`;
+                groups[key].forEach(time => {
+                    // Match against doctor ID as well for accuracy
+                    debugger;
+                    const booked = isSlotBooked(selectedDoctor, selectedDay, time);
+                    let className = booked
+                        ? 'booked-slot custom-tooltip-container'
+                        : (time === selectedTime ? 'selected-slot' : 'time-slot bg-white text-gray-700 hover:bg-gray-50 border-gray-300');
+
+                    let tooltip = '';
+                    if (booked) {
+                        tooltip = `
+                                                            <div class="custom-tooltip">
+                                                                <p class="font-bold border-b border-gray-500 pb-1 mb-1">Booked</p>
+                                                                <p class="text-xs">Name: ${booked.FirstName}</p>
+                                                                <p class="text-xs">Phone: ${booked.Contact}</p>
+                                                            </div>
+                                                        `;
+                    }
+
+                    html += `<button class="${className} text-sm font-medium py-3 rounded-xl border shadow-soft transition" data-time="${time}">${time} ${tooltip}</button>`;
+                });
+                html += `</div>`;
+                container.innerHTML += html;
+            });
+
+            document.querySelectorAll('.time-slot').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.time-slot').forEach(b => {
+                        b.classList.remove('selected-slot');
+                        b.classList.add('bg-white', 'text-gray-700');
+                    });
+                    e.currentTarget.classList.add('selected-slot');
+                    e.currentTarget.classList.remove('bg-white', 'text-gray-700');
+                    selectedTime = e.currentTarget.dataset.time;
+
+                    // NEW FLOW: Open modal immediately for 'New' entry
+                    $('#AppointmentId').val(0);
+                    $('#patient-slot-info').text("New Appointment");
+                    $('#saveBtn').html('<i class="fas fa-save mr-2"></i> Save Booking');
+                    showPatientModal();
+                });
+            });
+        }
+
+        // Modal Control
+        function showPatientModal() {
+            const doctor = MOCK_DOCTORS.find(d => d.id == selectedDoctor);
+            const doctorSelect = document.getElementById('Doctor');
+
+            // Only populate doctor dropdown if we are in 'New' mode (ID=0),
+            // otherwise ShowTermGet handles it
+            if ($('#AppointmentId').val() == "0") {
+                document.getElementById('patient-form').reset();
+                document.getElementById('patient-form').reset();
+                document.getElementById('PDATE').value = formatDateToDisplay(selectedDay);
+                document.getElementById('PTime').value = selectedTime;
+
+                if (doctorSelect && doctor) {
+                    doctorSelect.innerHTML = `<option value="${doctor.id}">${doctor.name}</option>`;
+                    doctorSelect.value = doctor.id;
+                }
+
+                if (doctor) {
+                    $('#patient-slot-info').text(`${doctor.name} - ${selectedDay} at ${selectedTime}`);
+                }
+            } else {
+                // Editing mode: Ensure the select has options if not already populated
+                if (doctorSelect && doctorSelect.options.length === 0) {
+                    // Populate all doctors for edit mode availability
+                    MOCK_DOCTORS.forEach(d => {
+                        const opt = document.createElement('option');
+                        opt.value = d.id;
+                        opt.text = d.name;
+                        doctorSelect.appendChild(opt);
+                    });
+                }
+            }
+
+            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById('patient-modal');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                document.getElementById('patient-modal-content').classList.remove('scale-95', 'opacity-0');
+                document.getElementById('patient-modal-content').classList.add('scale-100', 'opacity-100');
+                // Default focus on First Name field
+                document.getElementById('AppFirst').focus();
+            }, 10);
+        }
+
+        window.closePatientModal = function () {
+            document.body.style.overflow = '';
+            document.getElementById('patient-modal-content').classList.remove('scale-100', 'opacity-100');
+            document.getElementById('patient-modal-content').classList.add('scale-95', 'opacity-0');
+            selectedTime = null;
+
+            // FIX: Do NOT call renderTimeSlots() here. It defaults to empty list and unblocks everything.
+            // Instead, just un-highlight the currently selected slot visually.
+            document.querySelectorAll('.selected-slot').forEach(el => {
+                el.classList.remove('selected-slot');
+                el.classList.add('bg-white', 'text-gray-700');
+            });
+
+            setTimeout(() => document.getElementById('patient-modal').classList.add('hidden'), 300);
+        }
+
+        // --- Search Modal Functions ---
+        window.openSearchModal = function () {
+            // Populate Doctor Search dropdown if empty
+            const doctorSearchSelect = document.getElementById('DoctorSearchId');
+            if (doctorSearchSelect && doctorSearchSelect.options.length <= 1) {
+                MOCK_DOCTORS.forEach(d => {
+                    const opt = document.createElement('option');
+                    opt.value = d.id;
+                    opt.text = d.name.toUpperCase() + ' - ' + d.specialty.toUpperCase();
+                    doctorSearchSelect.appendChild(opt);
+                });
+            }
+
+            // Set default dates to Today (dd/mm/yyyy)
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayStr = `${dd}/${mm}/${yyyy}`; // dd/mm/yyyy format
+
+            const fromEl = document.getElementById('FromDate');
+            const toEl = document.getElementById('ToDate');
+            fromEl.value = todayStr;
+            toEl.value = todayStr;
+
+            document.body.style.overflow = 'hidden';
+            const modal = document.getElementById('search-modal');
+            modal.classList.remove('hidden');
+        }
+
+        window.closeSearchModal = function () {
+            document.body.style.overflow = '';
+            document.getElementById('search-modal').classList.add('hidden');
+        }
+
+        window.AppointmentSearchList = function () {
+            var data = {};
+            data.FromDate = $("#FromDate").val();
+            data.ToDate = $("#ToDate").val();
+            data.Doctor = $("#DoctorSearchId").val();
+
+            $.ajax({
+                type: "POST",
+                url: "../Master/AppointmentSearchList",
+                data: data,
+                success: function (result) {
+                    ShowSearchlist(result.oList);
+                },
+                error: function (err) {
+                    console.warn("Backend search failed, using local mock data");
+                    // Fallback: Filter local bookings for demo
+                    let mockResults = bookings;
+                    if (data.Doctor && data.Doctor != '0') {
+                        mockResults = mockResults.filter(b => b.DoctorId == data.Doctor);
+                    }
+                    ShowSearchlist(mockResults);
+                }
+            });
+        }
+
+        window.ShowSearchlist = function (result) {
+            closeSearchModal(); // Adapted from $('#popupdiv').hide()
+            $('#calendar-view').hide(); // Adapted from $('#Entry').hide()
+            $('#listing').show();
+            disable_datatable('tblAppointment');
+
+            var Editbutton = '<button class="text-blue-600 hover:text-blue-800 transition"><i class="fas fa-edit"></i></button>';
+            var responseText = "<thead><tr><th width=1%;align=center>Sl#</th><th width=4% >RegId</th><th  width=20%>Name</th><th  width=10%>MR #</th><th width=15% class='text-left' >Doctor</th><th width=15%>Date</th><th width=10%>Time</th><th width=10% class='text-left' >Mobile No:</th><th width=3%>Edit</th></tr></thead><tbody>";
+
+            for (var i = 0; i < result.length; i++) {
+                var slno = parseInt(i + 1);
+                // Ensure properties exist/fallback
+                var id = result[i].AppointmentId;
+                var fname = result[i].FirstName || '';
+                var lname = result[i].LastName || '';
+                var doc = result[i].Doctor || ('Doctor ' + result[i].DoctorId) || '';
+                var date = result[i].AppointmentDate || '';
+                var time = result[i].AppointmentTime || '';
+                var contact = result[i].Contact || '';
+
+                responseText += '<tr><td align=center>' + slno + '</td><td>' + id + '</td><td>' + fname + '</td><td>' + lname + '</td><td align=left>' + doc + '</td><td align=left>' + date + '</td><td align=left>' + time + '</td><td align=left>' + contact + '</td><td onclick="GetRows(' + id + ')" align=center width=10px bgcolor="#00ffff "><a>' + Editbutton + '</a></td></tr>';
+            }
+            $('#tblAppointment').html(responseText + '</tbody> <tfoot> <tr><th> </th><th>Code</th><th>Name</th><th> </th><th> </th></tr></tfoot>');
+            datatableWithsearch1('tblAppointment');
+        }
+
+        window.onload = function () {
+            Doctorload();
+            document.getElementById('scrollLeftBtnDoctor').onclick = () => document.getElementById('doctorSelection').scrollBy({ left: -200, behavior: 'smooth' });
+            document.getElementById('scrollRightBtnDoctor').onclick = () => document.getElementById('doctorSelection').scrollBy({ left: 200, behavior: 'smooth' });
+            document.getElementById('scrollLeftBtn').onclick = () => { currentMonth.setMonth(currentMonth.getMonth() - 1); generateDays(); };
+            document.getElementById('scrollRightBtn').onclick = () => { currentMonth.setMonth(currentMonth.getMonth() + 1); generateDays(); };
+        };
+    </script>
+</body>
+
+</html>

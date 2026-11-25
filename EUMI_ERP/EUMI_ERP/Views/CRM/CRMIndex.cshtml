@@ -1,0 +1,1730 @@
+﻿@{
+    ViewBag.Title = "CRM";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .crm-wrap {
+        background: #fff;
+        font-family: sans-serif;
+    }
+
+    /* ===== TOP BAR ===== */
+    .crm-topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border-bottom: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+    .crm-brand-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #185FA5;
+    }
+
+    .crm-brand-sub {
+        font-size: 11px;
+        color: #6b7280;
+    }
+
+    .badge-leads {
+        background: #e6f1fb;
+        color: #185FA5;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    .badge-hot {
+        background: #faeeda;
+        color: #854F0B;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 3px 10px;
+        border-radius: 20px;
+    }
+
+    /* ===== TABS ===== */
+    .crm-tabs {
+        display: flex;
+        gap: 4px;
+    }
+
+    .crm-tab {
+        padding: 7px 16px;
+        font-size: 13px;
+        border-radius: 6px;
+        cursor: pointer;
+        border: 1px solid transparent;
+        color: #6b7280;
+        background: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+        .crm-tab.active {
+            background: #e6f1fb;
+            color: #185FA5;
+            border-color: #b5d4f4;
+            font-weight: 600;
+        }
+
+        .crm-tab:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+    /* ===== BODY ===== */
+    .crm-body {
+        padding: 20px;
+        background: #f9fafb;
+        min-height: 600px;
+    }
+
+    .page {
+        display: none;
+    }
+
+        .page.active {
+            display: block;
+        }
+
+    /* ===== DASHBOARD ===== */
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .stat-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        margin-bottom: 12px;
+    }
+
+        .stat-icon.blue {
+            background: #e6f1fb;
+            color: #185FA5;
+        }
+
+        .stat-icon.purple {
+            background: #EEEDFE;
+            color: #534AB7;
+        }
+
+        .stat-icon.amber {
+            background: #faeeda;
+            color: #854F0B;
+        }
+
+        .stat-icon.red {
+            background: #fcebeb;
+            color: #A32D2D;
+        }
+
+    .stat-num {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .stat-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+
+    .stat-growth {
+        float: right;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        background: #eaf3de;
+        color: #3B6D11;
+        font-weight: 600;
+    }
+
+    .chart-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 14px;
+    }
+
+    .chart-box {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    .chart-title {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ===== ENQUIRIES ===== */
+    .enq-layout {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 16px;
+    }
+
+    .date-label {
+        font-size: 12px;
+        font-weight: 600;
+        color: #6b7280;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 8px;
+        margin-top: 14px;
+    }
+
+    .lead-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+        margin-bottom: 10px;
+    }
+
+    .lead-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 700;
+        flex-shrink: 0;
+    }
+
+    .lead-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .src-badge {
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+    }
+
+    .src-direct {
+        background: #e6f1fb;
+        color: #185FA5;
+    }
+
+    .src-instagram {
+        background: #FBEAF0;
+        color: #993556;
+    }
+
+    .src-facebook {
+        background: #EEEDFE;
+        color: #534AB7;
+    }
+
+    .src-google {
+        background: #eaf3de;
+        color: #3B6D11;
+    }
+
+    .lead-contact {
+        display: flex;
+        gap: 16px;
+        font-size: 12px;
+        color: #6b7280;
+        margin: 8px 0;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .lead-note {
+        font-size: 12px;
+        color: #6b7280;
+        font-style: italic;
+        border-left: 3px solid #e5e7eb;
+        padding-left: 8px;
+        margin-top: 6px;
+    }
+
+    .followup-badge {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #D97706;
+    }
+
+    .followup-date {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+
+    .today-panel {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 16px;
+        height: fit-content;
+    }
+
+    .today-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .pending-badge {
+        background: #faeeda;
+        color: #854F0B;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 20px;
+        font-weight: 600;
+    }
+
+    .all-done-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 0;
+        color: #9ca3af;
+        font-size: 13px;
+        gap: 6px;
+        text-align: center;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn-primary-crm {
+        background: #185FA5;
+        color: #fff;
+        border: none;
+        border-radius: 7px;
+        padding: 8px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+    }
+
+        .btn-primary-crm:hover {
+            background: #14518A;
+        }
+
+    .btn-outline-crm {
+        background: none;
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+        padding: 8px 16px;
+        font-size: 13px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #374151;
+    }
+
+        .btn-outline-crm:hover {
+            background: #f3f4f6;
+        }
+
+    /* ===== FOLLOW-UP ===== */
+    .fu-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 12px;
+        margin-bottom: 18px;
+    }
+
+    .fu-stat-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .fu-stat-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #6b7280;
+    }
+
+    .fu-stat-num {
+        font-size: 26px;
+        font-weight: 700;
+        color: #111827;
+        margin-top: 4px;
+    }
+
+    .fu-layout {
+        display: grid;
+        grid-template-columns: 1fr 1.8fr;
+        gap: 14px;
+    }
+
+    .patient-dir {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 14px;
+    }
+
+    .patient-dir-title {
+        font-size: 12px;
+        font-weight: 700;
+        color: #6b7280;
+        margin-bottom: 12px;
+    }
+
+    .patient-item {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: border-color 0.2s;
+    }
+
+        .patient-item:hover,
+        .patient-item.selected {
+            border-color: #185FA5;
+            background: #f0f7ff;
+        }
+
+    .pi-name {
+        font-size: 16px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .pi-sub {
+        font-size: 11px;
+        color: #6b7280;
+        margin-top: 2px;
+    }
+
+    .rank-hot {
+        background: #faece7;
+        color: #993C1D;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .rank-warm {
+        background: #faeeda;
+        color: #854F0B;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .rank-cold {
+        background: #e6f1fb;
+        color: #185FA5;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .overdue-tag {
+        background: #fcebeb;
+        color: #A32D2D;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 20px;
+    }
+
+    .detail-panel {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+    }
+
+    .dp-name {
+        font-size: 20px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .dp-contact-pill {
+        border: 1px solid #d1d5db;
+        border-radius: 20px;
+        padding: 8px 18px;
+        font-size: 16px;
+        color: #374151;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+    }
+
+    .temp-bar {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        margin-top: 8px;
+    }
+
+    .temp-cell {
+        padding: 10px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border-right: 1px solid #e5e7eb;
+        background: #f9fafb;
+        color: #6b7280;
+        transition: all 0.2s;
+    }
+
+        .temp-cell:last-child {
+            border-right: none;
+        }
+
+        .temp-cell.hot-active {
+            background: #D85A30;
+            color: #fff;
+        }
+
+        .temp-cell.warm-active {
+            background: #EF9F27;
+            color: #fff;
+        }
+
+        .temp-cell.cold-active {
+            background: #185FA5;
+            color: #fff;
+        }
+
+        .temp-cell.drop-active {
+            background: #6b7280;
+            color: #fff;
+        }
+
+    .filter-rank-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+    .rank-filter-btn {
+        padding: 5px 14px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        border: 1px solid #d1d5db;
+        background: none;
+        color: #374151;
+        transition: all 0.2s;
+    }
+
+        .rank-filter-btn.active {
+            background: #111827;
+            color: #fff;
+            border-color: #111827;
+        }
+
+    .search-input {
+        border: 1px solid #d1d5db;
+        border-radius: 7px;
+        padding: 7px 12px 7px 32px;
+        font-size: 13px;
+        color: #374151;
+        background: #fff;
+        outline: none;
+        width: 200px;
+    }
+
+    .search-wrap {
+        position: relative;
+        display: inline-block;
+    }
+
+        .search-wrap i {
+            position: absolute;
+            left: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 15px;
+        }
+
+    .page-heading {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 4px;
+    }
+
+    .page-sub {
+        font-size: 12px;
+        color: #6b7280;
+        margin-bottom: 18px;
+    }
+
+    .call-log-area {
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        padding: 12px;
+        margin-top: 14px;
+        background: #f9fafb;
+    }
+
+    .call-log-item {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        padding: 6px 0;
+        border-bottom: 1px solid #e5e7eb;
+        color: #374151;
+    }
+
+    .chart-box {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .call-log-item:last-child {
+        border-bottom: none;
+    }
+
+    #detailPanel {
+        scroll-margin-top: 100px; /* adjust to match your navbar's height */
+    }
+
+    #btnApptFixed.active {
+        background: #1D9E75 !important;
+        border-color: #1D9E75 !important;
+        color: #fff !important;
+    }
+</style>
+
+
+
+<div class="crm-wrap">
+
+    <!-- TOP BAR -->
+    <div class="crm-topbar">
+        <div style="display:flex;align-items:center;gap:16px;">
+            <div>
+                <div class="crm-brand-title">CRM OPERATIONS</div>
+                <div class="crm-brand-sub">HMS CRM</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;">
+                <span class="badge-leads" id="lblTotalLeads">0 LEADS</span>
+                <span class="badge-hot" id="lblHotLeads">0 HOT 🔥</span>
+            </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div class="search-wrap">
+                <i class="ft-search"></i>
+                <input type="text" class="search-input" id="globalSearch" placeholder="Search leads..." onkeyup="GlobalSearch()" />
+            </div>
+            <div class="crm-tabs" style="display:none;">
+                <button class="crm-tab active" onclick="ShowTab('dashboard', this)" id="tabDashboard">
+                    <i class="ft-grid"></i> Dashboard
+                </button>
+                <button class="crm-tab" onclick="ShowTab('enquiries', this)" id="tabEnquiries">
+                    <i class="ft-user"></i> Patient Enquiries
+                </button>
+                <button class="crm-tab" onclick="ShowTab('followup', this)" id="tabFollowup">
+                    <i class="ft-phone-call"></i> CRM Follow-up
+                    <button class="crm-tab" onclick="ShowTab('assignment', this)" id="tabAssignment">
+                        <i class="ft-user-check"></i> Lead Assignment
+                    </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="crm-body">
+
+        <!-- ==================== DASHBOARD ==================== -->
+        <div id="tab-dashboard" class="page active">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;">
+                <div>
+                    <div class="page-heading">Overview</div>
+                    <div class="page-sub">MEDOC HMS CRM SYSTEM DASHBOARD</div>
+                </div>
+                <button class="btn-primary-crm" onclick="OpenAddEnquiry()">
+                    <i class="ft-plus"></i> Add New Enquiry
+                </button>
+            </div>
+
+            <!-- Stat Cards -->
+            <div class="stat-grid">
+                <div class="stat-card" onclick="GoToPatientEnquiries()" style="cursor:pointer;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div class="stat-icon blue"><i class="ft-users"></i></div>
+                        <span class="stat-growth" id="dbGrowthEnq">+0%</span>
+                    </div>
+                    <div class="stat-num" id="dbTotalEnq">0</div>
+                    <div class="stat-label">Total Enquiries</div>
+                </div>
+                <div class="stat-card">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div class="stat-icon purple"><i class="ft-calendar"></i></div>
+                        <span class="stat-growth" id="dbGrowthApp">+0%</span>
+                    </div>
+                    <div class="stat-num" id="dbTotalApp">0</div>
+                    <div class="stat-label">Appointments Fixed</div>
+                </div>
+
+                <div class="stat-card" onclick="GoToFollowupsToday()" style="cursor:pointer;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div class="stat-icon amber"><i class="ft-clock"></i></div>
+                    </div>
+                    <div class="stat-num" id="dbFollowupToday">0</div>
+                    <div class="stat-label">Follow-ups Today</div>
+                </div>
+                <div class="stat-card" onclick="GoToOverdueFollowups()" style="cursor:pointer;">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+                        <div class="stat-icon red"><i class="ft-alert-triangle"></i></div>
+                    </div>
+                    <div class="stat-num" id="dbMissedFollowup">0</div>
+                    <div class="stat-label">Missed Follow-ups</div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="chart-row">
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <i class="ft-trending-up"></i> Enquiry vs Appointment Conversion
+                    </div>
+                    <div style="position:relative; height:220px;">
+                        <canvas id="chartEnqApp"></canvas>
+                    </div>
+                    <div style="display:flex;gap:20px;margin-top:12px;">
+                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;">
+                            <div style="width:12px;height:12px;border-radius:3px;background:#378ADD;"></div>
+                            Enquiries
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#6b7280;">
+                            <div style="width:12px;height:12px;border-radius:3px;background:#1D9E75;"></div>
+                            Appointments
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">
+                        <i class="ft-pie-chart"></i> Leads by Source
+                    </div>
+                    <div style="position:relative; height:220px;">
+                        <canvas id="chartSource"></canvas>
+                    </div>
+                    <div id="sourceLegend" style="margin-top:4px;"></div>
+                </div>
+            </div>
+        </div>
+        <!-- ✅ tab-dashboard CLOSED HERE -->
+        <!-- ==================== PATIENT ENQUIRIES ==================== -->
+        <div id="tab-enquiries" class="page">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                <div>
+                    <div class="page-heading">Patient Inquiries</div>
+                    <div style="font-size:13px;font-weight:700;color:#111827;margin-top:6px;">
+                        Active Patient Enquiries
+                        <span style="background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-left:8px;" id="enqTotalBadge">0 Total</span>
+                    </div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:3px;">Manage leads from Google Ads, social media, and direct calls.</div>
+                </div>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+                    <button class="btn-outline-crm" onclick="OpenImportExcel()">
+                        <i class="ft-upload"></i> Import from Excel
+                    </button>
+                    <button class="btn-outline-crm" onclick="OpenEnqSearch()">
+                        <i class="ft-search"></i> Search
+                    </button>
+                    <button class="btn-primary-crm" onclick="OpenAddEnquiry()">
+                        <i class="ft-plus"></i> Add New Enquiry
+                    </button>
+                </div>
+            </div>
+
+            <div class="enq-layout">
+                <!-- Left: Enquiry List -->
+                <div>
+                    <!-- FILTER BAR -->
+                    <div id="filterBar" style="display:none;background:#fff;border:1px solid #e5e7eb;
+                         border-radius:10px;padding:16px 20px;margin-bottom:14px;">
+                        <div style="display:grid;grid-template-columns:2fr 1.5fr 1.5fr 1.5fr auto;gap:14px;align-items:end;">
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.5px;display:block;margin-bottom:6px;">SEARCH DETAILS</label>
+                                <div style="position:relative;">
+                                    <i class="ft-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#9ca3af;font-size:13px;"></i>
+                                    <input type="text" id="filterSearch" onkeyup="ApplyFilters()" placeholder="Name, phone, info..."
+                                           style="width:100%;padding:8px 10px 8px 32px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;color:#374151;outline:none;" />
+                                </div>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.5px;display:block;margin-bottom:6px;">LEAD SOURCE</label>
+                                <select id="filterSource" onchange="ApplyFilters()"
+                                        style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;color:#374151;outline:none;background:#fff;">
+                                    <option value="">All Sources</option>
+                                    <option value="Google">Google Ads</option>
+                                    <option value="Facebook">Facebook</option>
+                                    <option value="Instagram">Instagram</option>
+                                    <option value="Direct">Direct</option>
+                                    <option value="Referral">Referral</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.5px;display:block;margin-bottom:6px;">INQUIRY STATUS</label>
+                                <select id="filterStage" onchange="ApplyFilters()"
+                                        style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;color:#374151;outline:none;background:#fff;">
+                                    <option value="">All Statuses</option>
+                                    <option value="New Lead">New Lead</option>
+                                    <option value="Contacted">Contacted</option>
+                                    <option value="Appointment Fixed">Appointment Fixed</option>
+                                    <option value="Converted">Converted</option>
+                                    <option value="Lost">Lost</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="font-size:11px;font-weight:700;color:#6b7280;letter-spacing:0.5px;display:block;margin-bottom:6px;">FOLLOW-UP DATE</label>
+                                <select id="filterFollowup" onchange="ApplyFilters()"
+                                        style="width:100%;padding:8px 10px;border:1px solid #e5e7eb;border-radius:7px;font-size:13px;color:#374151;outline:none;background:#fff;">
+                                    <option value="">Any Date</option>
+                                    <option value="today">Today</option>
+                                    <option value="tomorrow">Tomorrow</option>
+                                    <option value="thisweek">This Week</option>
+                                    <option value="overdue">Overdue</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button onclick="ResetFilters()"
+                                        style="padding:8px 14px;border:1px solid #d1d5db;border-radius:7px;background:#fff;color:#374151;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:5px;white-space:nowrap;">
+                                    <i class="ft-refresh-cw" style="font-size:13px;"></i> Reset Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="font-size:11px;font-weight:600;color:#6b7280;text-align:right;margin-bottom:8px;" id="enqShowingLabel">SHOWING 0 OF 0 RECORDS</div>
+                    <div id="enqList">
+                        <div style="text-align:center;padding:40px;color:#9ca3af;font-size:14px;">
+                            <i class="ft-loader" style="font-size:24px;"></i><br />Loading...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Today's Follow-ups -->
+                <!-- Right: Follow-up Panel -->
+                <div class="today-panel">
+                    <div class="today-title">
+                        <span id="followupPanelTitle">FOLLOW-UPS</span>
+                        <span class="pending-badge" id="todayPendingBadge">0 Pending</span>
+                    </div>
+
+                    <!-- Date Picker -->
+                    <div style="display:flex;align-items:center;gap:6px;margin-bottom:8px;
+                background:#f9fafb;border:1px solid #e5e7eb;border-radius:7px;
+                padding:6px 10px;">
+                        <i class="ft-calendar" style="font-size:14px;color:#6b7280;"></i>
+                        <input type="text" id="followupDatePicker"
+                               style="border:none;background:transparent;font-size:13px;
+                      color:#374151;outline:none;flex:1;cursor:pointer;" readonly />
+                    </div>
+
+                    <!-- Quick Buttons -->
+                    <div style="display:flex;gap:6px;margin-bottom:12px;">
+                        <button id="fuBtnToday" onclick="FollowupQuick('today')"
+                                style="flex:1;font-size:11px;padding:5px 0;border:1px solid #d1d5db;
+                       border-radius:20px;background:#fff;color:#374151;cursor:pointer;">
+                            Today
+                        </button>
+                        <button id="fuBtnTomorrow" onclick="FollowupQuick('tomorrow')"
+                                style="flex:1;font-size:11px;padding:5px 0;border:1px solid #d1d5db;
+                       border-radius:20px;background:#fff;color:#374151;cursor:pointer;">
+                            Tomorrow
+                        </button>
+                        <button id="fuBtnAfter" onclick="FollowupQuick('after')"
+                                style="flex:1;font-size:11px;padding:5px 0;border:1px solid #d1d5db;
+                       border-radius:20px;background:#fff;color:#374151;cursor:pointer;">
+                            Day After
+                        </button>
+                    </div>
+
+                    <div style="margin-bottom:12px;">
+                        <button id="fuBtnOverdue" onclick="FollowupQuick('overdue')"
+                                style="width:100%;font-size:11px;font-weight:700;padding:6px 0;
+                       border:1px solid #fecaca;border-radius:20px;background:#fff5f5;
+                       color:#A32D2D;cursor:pointer;display:flex;align-items:center;
+                       justify-content:center;gap:6px;">
+                            <i class="ft-alert-triangle" style="font-size:12px;"></i>
+                            Overdue <span id="fuOverdueCount">(0)</span>
+                        </button>
+                    </div>
+
+
+                    <!-- List -->
+                    <div id="todayFollowupList">
+                        <div class="all-done-box">
+                            <i class="ft-check-circle" style="font-size:30px;"></i>
+                            <div style="font-weight:600;color:#374151;">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!-- ✅ tab-enquiries CLOSED HERE -->
+        <!-- ==================== CRM FOLLOW-UP ==================== -->
+        <div id="tab-followup" class="page">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+                <div class="page-heading">CRM Follow-up Board</div>
+                <button class="btn-outline-crm" onclick="OpenFollowupSearch()">
+                    <i class="ft-search"></i> Search
+                </button>
+            </div>
+
+            <!-- Summary Cards -->
+            <div class="fu-stat-grid">
+                <div class="fu-stat-card">
+                    <div class="fu-stat-info">
+                        <div class="fu-stat-label">TOTAL FOLLOW-UPS</div>
+                        <div class="fu-stat-num" id="fuTotal">0</div>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:8px;background:#e6f1fb;color:#185FA5;display:flex;align-items:center;justify-content:center;font-size:18px;">
+                        <i class="ft-clock"></i>
+                    </div>
+                </div>
+                <div class="fu-stat-card">
+                    <div class="fu-stat-info">
+                        <div class="fu-stat-label" style="color:#993C1D;">🔥 HOT FOLLOW-UPS</div>
+                        <div class="fu-stat-num" style="color:#D85A30;" id="fuHot">0</div>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:8px;background:#faece7;display:flex;align-items:center;justify-content:center;font-size:18px;">🔥</div>
+                </div>
+                <div class="fu-stat-card">
+                    <div class="fu-stat-info">
+                        <div class="fu-stat-label" style="color:#854F0B;">🟠 WARM FOLLOW-UPS</div>
+                        <div class="fu-stat-num" style="color:#BA7517;" id="fuWarm">0</div>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:8px;background:#faeeda;display:flex;align-items:center;justify-content:center;font-size:18px;">🟠</div>
+                </div>
+                <div class="fu-stat-card">
+                    <div class="fu-stat-info">
+                        <div class="fu-stat-label" style="color:#185FA5;">❄ COLD FOLLOW-UPS</div>
+                        <div class="fu-stat-num" style="color:#6b7280;" id="fuCold">0</div>
+                    </div>
+                    <div style="width:36px;height:36px;border-radius:8px;background:#e6f1fb;display:flex;align-items:center;justify-content:center;font-size:18px;">❄</div>
+                </div>
+            </div>
+
+            <!-- Filter Row -->
+            <div class="filter-rank-row">
+                <span style="font-size:12px;font-weight:700;color:#6b7280;">FILTER RANK:</span>
+                <button class="rank-filter-btn active" onclick="FilterRank('All', this)">All</button>
+                <button class="rank-filter-btn" onclick="FilterRank('Hot', this)">🔥 Hot</button>
+                <button class="rank-filter-btn" onclick="FilterRank('Warm', this)">🟠 Warm</button>
+                <button class="rank-filter-btn" onclick="FilterRank('Cold', this)">❄ Cold</button>
+                <button class="rank-filter-btn" onclick="FilterRank('Lost', this)">Lost</button>
+                <button class="rank-filter-btn" id="btnApptFixed" onclick="FilterRank('AppointmentFixed', this)"
+                        style="border-color:#1D9E75;color:#1D9E75;">
+                    📅 Appointment Fixed
+                </button>
+                <div class="search-wrap" style="margin-left:auto;">
+                    <i class="ft-search"></i>
+                    <input type="text" class="search-input" id="fuSearch"
+                           placeholder="Search patient, treatment..." onkeyup="FilterPatientDir()" />
+                </div>
+            </div>
+
+            <!-- Follow-up Layout -->
+            <div class="fu-layout">
+                <div class="patient-dir">
+                    <div class="patient-dir-title" id="patDirTitle">PATIENT DIRECTORY (0)</div>
+                    <div id="patientDirList">
+                        <div style="text-align:center;padding:20px;color:#9ca3af;font-size:13px;">No records</div>
+                    </div>
+                </div>
+                <div class="detail-panel" id="detailPanel">
+                    <div style="text-align:center;padding:40px;color:#9ca3af;font-size:13px;">
+                        <i class="ft-user" style="font-size:30px;"></i>
+                        <div style="margin-top:8px;">Select a patient to view details</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ✅ tab-followup CLOSED HERE -->
+        <!-- ==================== LEAD ASSIGNMENT ==================== -->
+        <div id="tab-assignment" class="page">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+                <div>
+                    <div class="page-heading">Lead Assignment</div>
+                    <div class="page-sub">Assign leads to staff for follow-up</div>
+                </div>
+                <button class="btn-primary-crm" id="btnAssignSelected" style="display:none;" onclick="OpenAssignModal()">
+                    <i class="ft-user-check"></i> Assign Selected (<span id="assignSelectedCount">0</span>)
+                </button>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap;">
+                <label style="display:flex;align-items:center;gap:6px;font-size:13px;color:#374151;cursor:pointer;">
+                    <input type="checkbox" id="assignUnassignedOnly" onchange="RenderAssignmentList()" />
+                    Unassigned only
+                </label>
+                <div style="position:relative;display:inline-block;">
+                    <input type="text" id="assignFilterStaffInput" autocomplete="off" placeholder="All Staff"
+                           onkeyup="CRMStaffFilter(this.value, 'assignFilterStaffSuggestions', 'assignFilterStaff', 'assignFilterStaffInput'); if(this.value.trim()===''){document.getElementById('assignFilterStaff').value='';RenderAssignmentList();}"
+                           onfocus="CRMStaffFilter(this.value, 'assignFilterStaffSuggestions', 'assignFilterStaff', 'assignFilterStaffInput')"
+                           onblur="setTimeout(function(){CRMHideStaffSuggestions('assignFilterStaffSuggestions')}, 150)"
+                           style="padding:7px 10px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;color:#374151;background:#fff;width:180px;" />
+                    <input type="hidden" id="assignFilterStaff" value="" />
+                    <div id="assignFilterStaffSuggestions"
+                         style="display:none;position:absolute;left:0;right:0;top:100%;
+                background:#fff;border:1px solid #e5e7eb;border-top:none;
+                border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                z-index:10050;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+                </div>
+                <div class="search-wrap" style="margin-left:auto;">
+                    <i class="ft-search"></i>
+                    <input type="text" class="search-input" id="assignSearch" placeholder="Search leads..." onkeyup="RenderAssignmentList()" />
+                </div>
+            </div>
+            <div style="background:#fff;border:1px solid #e5e7eb;border-radius:10px;overflow:hidden;">
+                <table style="width:100%;border-collapse:collapse;font-size:15px;">
+                    <thead style="background:#f9fafb;">
+                        <tr>
+                            <th style="padding:14px 12px;text-align:left;width:36px;">
+                                <input type="checkbox" id="assignSelectAll" onchange="ToggleSelectAllAssign(this)" style="width:16px;height:16px;" />
+                            </th>
+                            <th style="padding:14px 12px;text-align:left;font-size:14px;">Patient</th>
+                            <th style="padding:14px 12px;text-align:left;font-size:14px;">Mobile</th>
+                            <th style="padding:14px 12px;text-align:left;font-size:14px;">Source</th>
+                            <th style="padding:14px 12px;text-align:left;font-size:14px;">Temperature</th>
+                            <th style="padding:14px 12px;text-align:left;font-size:14px;">Assigned To</th>
+                        </tr>
+                    </thead>
+                    <tbody id="assignmentTableBody">
+                        <tr><td colspan="6" style="padding:30px;text-align:center;color:#9ca3af;">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <!-- ✅ tab-assignment CLOSED HERE -->
+    </div><!-- ✅ crm-body CLOSED HERE -->
+    <!-- ========== SEARCH POPUP (Enquiries & Followup) ========== -->
+    <div id="crmSearchModal" style="display:none;position:fixed;top:0;left:0;
+     width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;
+     align-items:center;justify-content:center;">
+        <div style="background:#fff;border-radius:12px;padding:0;width:500px;
+                box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+
+            <!-- Header -->
+            <div style="padding:18px 24px;background:#185FA5;border-radius:12px 12px 0 0;
+                    display:flex;justify-content:space-between;align-items:center;">
+                <div style="font-size:16px;font-weight:700;color:#fff;">
+                    <i class="ft-search" style="margin-right:8px;"></i>Search Options
+                </div>
+                <button onclick="CloseEnqSearch()"
+                        style="background:none;border:none;color:#fff;
+                           font-size:22px;cursor:pointer;line-height:1;">
+                    &times;
+                </button>
+            </div>
+
+            <!-- Body -->
+            <div style="padding:24px;">
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+
+                    <!-- From Date -->
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:#6b7280;
+                                  letter-spacing:0.5px;display:block;margin-bottom:6px;">
+                            FROM DATE
+                        </label>
+                        <input type="text" id="srchFromDate"
+                               style="width:100%;border:1px solid #e5e7eb;border-radius:8px;
+                                  padding:10px 14px;font-size:13px;color:#374151;
+                                  background:#f9fafb;outline:none;" />
+                    </div>
+
+                    <!-- To Date -->
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:#6b7280;
+                                  letter-spacing:0.5px;display:block;margin-bottom:6px;">
+                            TO DATE
+                        </label>
+                        <input type="text" id="srchToDate"
+                               style="width:100%;border:1px solid #e5e7eb;border-radius:8px;
+                                  padding:10px 14px;font-size:13px;color:#374151;
+                                  background:#f9fafb;outline:none;" />
+                    </div>
+
+                    <!-- Lead Source -->
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:#6b7280;
+                                  letter-spacing:0.5px;display:block;margin-bottom:6px;">
+                            LEAD SOURCE
+                        </label>
+                        <select id="srchSource"
+                                style="width:100%;border:1px solid #e5e7eb;border-radius:8px;
+                                   padding:10px 14px;font-size:13px;color:#374151;
+                                   background:#f9fafb;outline:none;">
+                            <option value="">All Sources</option>
+                            <option value="Google">Google Ads</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Direct">Direct</option>
+                            <option value="Referral">Referral</option>
+                        </select>
+                    </div>
+
+                    <!-- Inquiry Status -->
+                    <div>
+                        <label style="font-size:11px;font-weight:700;color:#6b7280;
+                                  letter-spacing:0.5px;display:block;margin-bottom:6px;">
+                            INQUIRY STATUS
+                        </label>
+                        <select id="srchStage"
+                                style="width:100%;border:1px solid #e5e7eb;border-radius:8px;
+                                   padding:10px 14px;font-size:13px;color:#374151;
+                                   background:#f9fafb;outline:none;">
+                            <option value="">All Statuses</option>
+                            <option value="New Lead">New Lead</option>
+                            <option value="Contacted">Contacted</option>
+                            <option value="Appointment Fixed">Appointment Fixed</option>
+                            <option value="Converted">Converted</option>
+                            <option value="Lost">Lost</option>
+                        </select>
+                    </div>
+
+                    <!-- Follow-up Date Filter -->
+                    <div style="grid-column:1/-1;">
+                        <label style="font-size:11px;font-weight:700;color:#6b7280;
+                                  letter-spacing:0.5px;display:block;margin-bottom:6px;">
+                            FOLLOW-UP DATE
+                        </label>
+                        <select id="srchFollowup"
+                                style="width:100%;border:1px solid #e5e7eb;border-radius:8px;
+                                   padding:10px 14px;font-size:13px;color:#374151;
+                                   background:#f9fafb;outline:none;">
+                            <option value="">Any Date</option>
+                            <option value="today">Today</option>
+                            <option value="tomorrow">Tomorrow</option>
+                            <option value="thisweek">This Week</option>
+                            <option value="overdue">Overdue</option>
+                        </select>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div style="padding:16px 24px;border-top:1px solid #e5e7eb;
+                    display:flex;justify-content:flex-end;gap:10px;">
+                <button onclick="ResetEnqSearch()"
+                        style="padding:10px 20px;border:1px solid #d1d5db;border-radius:8px;
+                           background:#f9fafb;color:#374151;font-size:13px;
+                           font-weight:600;cursor:pointer;display:flex;
+                           align-items:center;gap:6px;">
+                    <i class="ft-refresh-cw"></i> Reset
+                </button>
+                <button onclick="ApplyEnqSearch()"
+                        style="padding:10px 24px;border:none;border-radius:8px;
+                           background:#185FA5;color:#fff;font-size:13px;
+                           font-weight:600;cursor:pointer;display:flex;
+                           align-items:center;gap:6px;">
+                    <i class="ft-search"></i> Go
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== IMPORT FROM EXCEL MODAL ========== -->
+    <div id="importExcelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 0;">
+        <div id="importExcelCard" style="background:#fff;border-radius:12px;padding:24px;width:90%;max-width:1100px;margin-bottom:24px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                <div style="font-size:16px;font-weight:700;color:#111827;">Import Enquiries from Excel</div>
+                <button onclick="CloseImportExcel()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">&times;</button>
+            </div>
+
+            <!-- Step 1: Upload -->
+            <div id="importUploadStep">
+                <div style="border:2px dashed #d1d5db;border-radius:10px;padding:30px;text-align:center;background:#f9fafb;">
+                    <i class="ft-upload" style="font-size:28px;color:#185FA5;"></i>
+                    <div style="font-size:14px;color:#374151;margin-top:10px;font-weight:600;">Choose an Excel file (.xlsx, .xls, .csv) to import</div>
+                    <div style="font-size:12px;color:#6b7280;margin-top:4px;">
+                        Expected columns: Patient Name, Mobile, Email, Source, Location, Treatment Inquired, Enquiry Date, Follow-up Date, Notes
+                    </div>
+                    <input type="file" id="importExcelFile" accept=".xlsx,.xls,.csv" style="margin-top:16px;" onchange="HandleImportExcelFile(this.files[0])" />
+                </div>
+            </div>
+
+            <!-- Step 2: Preview / Edit Grid -->
+            <div id="importPreviewStep" style="display:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <div style="font-size:13px;font-weight:700;color:#111827;">
+                        Preview
+                        <span id="importRowCountBadge" style="background:#e6f1fb;color:#185FA5;font-size:11px;font-weight:700;padding:2px 10px;border-radius:20px;margin-left:6px;">0 rows</span>
+                    </div>
+                    <div id="importErrorBanner" style="font-size:12px;color:#6b7280;">Fields outlined in red are missing Patient Name / Mobile.</div>
+                </div>
+                <div style="max-height:420px;overflow:auto;border:1px solid #e5e7eb;border-radius:8px;">
+                    <table style="width:100%;border-collapse:collapse;font-size:12px;">
+                        <thead style="position:sticky;top:0;background:#f9fafb;z-index:1;">
+                            <tr>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">#</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Patient Name *</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Mobile *</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Email</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Source</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Location</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Treatment Inquired</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Enquiry Date</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Follow-up Date</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:left;">Notes</th>
+                                <th style="padding:8px;border-bottom:1px solid #e5e7eb;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="importPreviewBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;">
+                <div id="importSaveStatus" style="font-size:12px;color:#6b7280;"></div>
+                <div style="display:flex;gap:8px;">
+                    <button class="btn-outline-crm" onclick="CloseImportExcel()">Cancel</button>
+                    <button class="btn-primary-crm" id="importSaveAllBtn" style="display:none;" onclick="SaveAllImportedEnquiries()">
+                        <i class="ft-save"></i> Import <span id="importSaveAllCount"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- ✅ crm-wrap CLOSED HERE -->
+<!-- ========== ADD ENQUIRY MODAL 11 ========== -->
+<div id="addEnquiryModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 0;">
+    <div id="addEnquiryCard" style="background:#fff;border-radius:12px;padding:24px;width:560px;max-height:none;overflow:visible;margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;">
+            <div style="font-size:16px;font-weight:700;color:#111827;" id="enqModalTitle">Add New Enquiry</div>
+            <button onclick="CloseAddEnquiry()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">&times;</button>
+        </div>
+        <input type="hidden" id="enqEditId" value="0" />
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Patient Name *</label>
+                <input type="text" id="enqPatientName" class="form-control"
+                       onkeyup="this.value = this.value.toUpperCase()"
+                       style="margin-top:4px;" placeholder="FULL NAME" />
+            </div>
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Mobile Number *</label>
+                <input type="text" id="enqMobile" class="form-control"
+                       style="margin-top:4px;"
+                       placeholder="+91 XXXXXXXXXX"
+                       onkeypress="return CRMDigitsOnly(event, 'enqMobile')"
+                       onpaste="this.value=this.value.replace(/[^0-9]/g,'');" />
+            </div>
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Email</label>
+                <input type="text" id="enqEmail" class="form-control"
+                       style="margin-top:4px;" placeholder="email@example.com" />
+            </div>
+
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Source *</label>
+                <select id="enqSource" class="form-control" style="margin-top:4px;">
+                    <option value="">-- Select --</option>
+                    <option value="Google">Google Ads</option>
+                    <option value="Facebook">Facebook</option>
+                    <option value="Instagram">Instagram</option>
+                    <option value="Direct">Direct</option>
+                    <option value="Referral">Referral</option>
+                </select>
+            </div>
+
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Enquiry Date *</label>
+                <input type="text" id="enqDate" class="form-control"
+                       style="margin-top:4px;" />
+            </div>
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Follow-up Date</label>
+                <input type="text" id="enqFollowupDate" class="form-control"
+                       style="margin-top:4px;" />
+            </div>
+
+            <div style="grid-column:1/-1;position:relative;">
+                <label style="font-size:12px;font-weight:600;color:#374151;">Assign To</label>
+                <input type="text" id="enqAssignedToInput" class="form-control" autocomplete="off"
+                       onkeyup="CRMStaffFilter(this.value, 'enqAssignedToSuggestions', 'enqAssignedTo', 'enqAssignedToInput')"
+                       onfocus="CRMStaffFilter(this.value, 'enqAssignedToSuggestions', 'enqAssignedTo', 'enqAssignedToInput')"
+                       onblur="setTimeout(function(){CRMHideStaffSuggestions('enqAssignedToSuggestions')}, 150)"
+                       style="margin-top:4px;" placeholder="-- Select Staff --" />
+                <input type="hidden" id="enqAssignedTo" value="" />
+                <div id="enqAssignedToSuggestions"
+                     style="display:none;position:absolute;left:0;right:0;top:100%;
+                            background:#fff;border:1px solid #e5e7eb;border-top:none;
+                            border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                            z-index:10000;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+            </div>
+
+            <div style="grid-column:1/-1;position:relative;">
+                <label style="font-size:12px;font-weight:600;color:#374151;">Location</label>
+                <div style="display:flex;gap:6px;margin-top:4px;">
+                    <div style="position:relative;flex:1;">
+                        <input type="text" id="enqLocation" class="form-control"
+                               autocomplete="off"
+                               onkeyup="this.value = this.value.toUpperCase(); CRMAreaAutocomplete(this.value);"
+                               onfocus="if(this.value) CRMAreaAutocomplete(this.value)"
+                               onblur="setTimeout(CRMHideAreaSuggestions, 150)"
+                               placeholder="e.g. CITY / AREA" style="width:100%;" />
+                        <div id="enqLocationSuggestions"
+                             style="display:none;position:absolute;left:0;right:0;top:100%;
+                        background:#fff;border:1px solid #e5e7eb;border-top:none;
+                        border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                        z-index:10000;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+                    </div>
+                    <button type="button" onclick="CRMOpenAreaMaster()" title="Add New Area"
+                            style="width:40px;flex-shrink:0;border:1px solid #d1d5db;
+                       border-radius:7px;background:#f9fafb;color:#185FA5;font-size:18px;
+                       font-weight:700;cursor:pointer;display:flex;align-items:center;
+                       justify-content:center;">
+                        +
+                    </button>
+                </div>
+            </div>
+
+
+            <div style="grid-column:1/-1;position:relative;">
+                <label style="font-size:12px;font-weight:600;color:#374151;">Treatment Inquired</label>
+                <div id="enqTreatmentTagBox" onclick="document.getElementById('enqTreatmentInput').focus()"
+                     style="margin-top:4px;min-height:42px;border:1px solid #d1d5db;border-radius:7px;
+            padding:6px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+            background:#fff;cursor:text;max-width:100%;overflow-wrap:break-word;">
+                    <input type="text" id="enqTreatmentInput"
+                           autocomplete="off"
+                           onkeydown="CRMTreatmentKeydown(event)"
+                           onkeyup="CRMProcedureAutocomplete(this.value)"
+                           onfocus="if(this.value) CRMProcedureAutocomplete(this.value)"
+                           onblur="setTimeout(CRMFlushTreatmentInput, 150)"
+                           style="border:none;outline:none;flex:1;min-width:140px;font-size:14px;padding:4px 2px;"
+                           placeholder="Type or pick treatments..." />
+                </div>
+                <input type="hidden" id="enqTreatment" />
+                <div id="enqTreatmentSuggestions"
+                     style="display:none;position:absolute;left:0;right:0;top:100%;
+                            background:#fff;border:1px solid #e5e7eb;border-top:none;
+                            border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                            z-index:10000;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+            </div>
+
+
+            <div style="grid-column:1/-1;">
+                <label style="font-size:12px;font-weight:600;color:#374151;">Remarks / Notes</label>
+                <textarea id="enqRemarks" class="form-control" rows="2"
+                          onkeyup="this.value = this.value.toUpperCase()"
+                          style="margin-top:4px;word-break:break-all;overflow-wrap:break-word;" placeholder="ANY NOTES ABOUT THIS PATIENT..."></textarea>
+            </div>
+
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+            <button class="btn-outline-crm" onclick="CloseAddEnquiry()">Cancel</button>
+            <button class="btn-primary-crm" onclick="SaveEnquiry()">
+                <i class="ft-save"></i> <span id="enqSaveBtnLabel">Save Enquiry</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- ========== LOG CALL MODAL ========== -->
+<div id="logCallModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 0;">
+    <div id="logCallCard" style="background:#fff;border-radius:12px;padding:24px;width:500px;max-height:none;overflow:visible;margin-bottom:24px;">
+        <div id="logCallHeader" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:700;color:#111827;">Log Call Details</div>
+            <button onclick="CloseLogCall()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">&times;</button>
+        </div>
+        <input type="hidden" id="logEnqId" />
+        <div style="display:grid;gap:10px;">
+            <div id="logOriginalTreatmentBox" style="display:none;background:#f0f7ff;border:1px solid #b5d4f4;border-radius:8px;padding:10px 12px;">
+                <div style="font-size:11px;font-weight:700;color:#185FA5;letter-spacing:0.5px;margin-bottom:4px;">
+                    <i class="ft-activity"></i> TREATMENT INQUIRED (FROM ENQUIRY)
+                </div>
+                <div id="logOriginalTreatmentText" style="font-size:14px;color:#111827;font-weight:700;"></div>
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Call Remarks *</label>
+                <textarea id="logRemarks" class="form-control" rows="3" style="margin-top:4px;word-break:break-all;overflow-wrap:break-word;" placeholder="What was discussed..."></textarea>
+            </div>
+
+            <div style="position:relative;">
+                <label style="font-size:12px;font-weight:600;color:#374151;">Treatment Inquired</label>
+                <div id="logTreatmentTagBox" onclick="document.getElementById('logTreatmentInput').focus()"
+                     style="margin-top:4px;min-height:42px;border:1px solid #d1d5db;border-radius:7px;
+            padding:6px 8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+            background:#fff;cursor:text;max-width:100%;overflow-wrap:break-word;">
+                    <input type="text" id="logTreatmentInput"
+                           autocomplete="off"
+                           onkeydown="CRMLogTreatmentKeydown(event)"
+                           onkeyup="CRMLogProcedureAutocomplete(this.value)"
+                           onfocus="if(this.value) CRMLogProcedureAutocomplete(this.value)"
+                           onblur="setTimeout(CRMFlushLogTreatmentInput, 150)"
+                           style="border:none;outline:none;flex:1;min-width:140px;font-size:14px;padding:4px 2px;"
+                           placeholder="Type or pick treatments..." />
+                </div>
+                <input type="hidden" id="logTreatment" />
+                <div id="logTreatmentSuggestions"
+                     style="display:none;position:absolute;left:0;right:0;top:100%;
+                            background:#fff;border:1px solid #e5e7eb;border-top:none;
+                            border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                            z-index:10000;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+            </div>
+
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Next Follow-up Date</label>
+                <div style="position:relative;margin-top:4px;">
+                    <input type="text" id="logNextFollowup" class="form-control" style="padding-right:28px;" />
+                    <span onclick="CRMClearDate('logNextFollowup')"
+                          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);
+                                 cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;">&times;</span>
+                </div>
+            </div>
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">Appointment Date</label>
+                <div style="position:relative;margin-top:4px;">
+                    <input type="text" id="logAppointmentDate" class="form-control" style="padding-right:28px;" />
+                    <span onclick="CRMClearDate('logAppointmentDate')"
+                          style="position:absolute;right:8px;top:50%;transform:translateY(-50%);
+                                 cursor:pointer;color:#9ca3af;font-size:16px;line-height:1;">&times;</span>
+                </div>
+            </div>
+
+            <div>
+                <label style="font-size:12px;font-weight:600;color:#374151;">CRM Temperature</label>
+                <select id="logTemperature" class="form-control" style="margin-top:4px;">
+                    <option value="Hot">🔥 Hot</option>
+                    <option value="Warm">🟠 Warm</option>
+                    <option value="Cold">❄ Cold</option>
+                    <option value="Lost">Lost</option>
+                </select>
+            </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+            <button class="btn-outline-crm" onclick="CloseLogCall()">Cancel</button>
+            <button class="btn-primary-crm" onclick="SaveCallLog()">
+                <i class="ft-save"></i> Save Log
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<!-- Delete Confirmation Modal -->
+<div id="confirmDeleteModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:8px;padding:0;width:400px;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="padding:20px 24px;border-bottom:1px solid #e5e7eb;">
+            <div style="font-size:18px;font-weight:700;color:#111827;">Delete Enquiry</div>
+        </div>
+        <div style="padding:24px;">
+            <div style="font-size:14px;color:#374151;margin-bottom:20px;" id="deleteConfirmMessage">
+                Do you want to delete this enquiry?
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+                <button type="button" class="btn-outline-crm" onclick="CloseDeleteModal()" style="padding:8px 20px;">Cancel</button>
+                <button type="button" class="btn-primary-crm" id="confirmDeleteOk" onclick="ConfirmDelete()" style="background:#d33;padding:8px 20px;">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Appointment Confirm Modal -->
+<div id="crmApptConfirmModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:8px;padding:0;width:420px;box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <div style="padding:20px 24px;border-bottom:1px solid #e5e7eb;">
+            <div style="font-size:18px;font-weight:700;color:#111827;">Appointment Date Set</div>
+        </div>
+        <div style="padding:24px;">
+            <div style="font-size:14px;color:#374151;margin-bottom:20px;" id="crmApptConfirmMessage">
+                Open Appointment Booking now?
+            </div>
+            <div style="display:flex;justify-content:flex-end;gap:12px;">
+                <button type="button" class="btn-outline-crm" onclick="CRMApptConfirmNo()" style="padding:8px 20px;">No</button>
+                <button type="button" class="btn-primary-crm" onclick="CRMApptConfirmYes()" style="padding:8px 20px;">Yes, Open Booking</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- ========== ASSIGN LEADS MODAL ========== -->
+<div id="assignLeadsModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:10000;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:12px;padding:24px;width:420px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <div style="font-size:16px;font-weight:700;color:#111827;">Assign Leads</div>
+            <button onclick="CloseAssignModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#6b7280;">&times;</button>
+        </div>
+        <div style="font-size:13px;color:#6b7280;margin-bottom:14px;">
+            <span id="assignModalCount">0</span> lead(s) selected. Choose a staff member to assign them to:
+        </div>
+        <div style="position:relative;">
+            <input type="text" id="assignModalStaffInput" autocomplete="off" placeholder="-- Select Staff --"
+                   onkeyup="CRMStaffFilter(this.value, 'assignModalStaffSuggestions', 'assignModalStaffSelect', 'assignModalStaffInput')"
+                   onfocus="CRMStaffFilter(this.value, 'assignModalStaffSuggestions', 'assignModalStaffSelect', 'assignModalStaffInput')"
+                   onblur="setTimeout(function(){CRMHideStaffSuggestions('assignModalStaffSuggestions')}, 150)"
+                   style="width:100%;padding:10px 12px;border:1px solid #d1d5db;border-radius:7px;font-size:13px;color:#374151;background:#fff;" />
+            <input type="hidden" id="assignModalStaffSelect" value="" />
+            <div id="assignModalStaffSuggestions"
+                 style="display:none;position:absolute;left:0;right:0;top:100%;
+                background:#fff;border:1px solid #e5e7eb;border-top:none;
+                border-radius:0 0 8px 8px;max-height:180px;overflow-y:auto;
+                z-index:10050;box-shadow:0 6px 16px rgba(0,0,0,0.1);"></div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:18px;">
+            <button class="btn-outline-crm" onclick="CloseAssignModal()">Cancel</button>
+            <button class="btn-primary-crm" onclick="ConfirmAssignLeads()">
+                <i class="ft-check"></i> Assign
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal-option-btn.active-opt {
+        background: #e6f1fb !important;
+        border-color: #185FA5 !important;
+        color: #185FA5 !important;
+        font-weight: 600;
+    }
+
+    .fu-qbtn-active {
+        background: #e6f1fb !important;
+        color: #185FA5 !important;
+        border-color: #b5d4f4 !important;
+        font-weight: 600;
+    }
+
+
+
+    .proc-suggest-item {
+        transition: background 0.12s, color 0.12s;
+    }
+
+        .proc-suggest-item:hover {
+            background: #e6f1fb;
+            color: #185FA5;
+            font-weight: 600;
+        }
+
+        .proc-suggest-item.proc-suggest-active {
+            background: #e6f1fb;
+            color: #185FA5;
+            font-weight: 600;
+        }
+
+    .treatment-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: #e6f1fb;
+        color: #185FA5;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 5px 8px 5px 10px;
+        border-radius: 20px;
+        max-width: 100%;
+        word-break: break-all;
+        white-space: normal;
+    }
+
+        .treatment-chip .chip-remove {
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+            color: #185FA5;
+            opacity: 0.6;
+        }
+
+            .treatment-chip .chip-remove:hover {
+                opacity: 1;
+            }
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="~/app_demo/assets/js/Chart.js"></script>
+<script type="text/javascript" src="~/ProjectScript/CRMIndex.js"></script>
+
+
+
+<script>
+    $(function () {
+        // ENQUIRY DATE - today and past only (no future)
+        $('#enqDate').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            maxDate: moment(),
+            drops: 'down',
+            opens: 'left',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        // FOLLOW-UP DATE - today and future only (no past)
+        $('#enqFollowupDate').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            minDate: moment(),
+            drops: 'down',
+            opens: 'left',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        // LOG CALL NEXT FOLLOW-UP - today and future only
+        $('#logNextFollowup').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            minDate: moment(),
+            drops: 'down',
+            opens: 'right',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        // APPOINTMENT DATE - today and future only
+        $('#logAppointmentDate').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            minDate: moment(),
+            drops: 'down',
+            opens: 'right',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        // SEARCH FROM DATE
+        $('#srchFromDate').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            drops: 'down',
+            opens: 'center',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        // SEARCH TO DATE
+        $('#srchToDate').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            drops: 'down',
+            opens: 'center',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+        // Follow-up panel date picker
+        $('#followupDatePicker').daterangepicker({
+            singleDatePicker: true,
+            showDropdowns: true,
+            autoApply: true,
+            drops: 'down',
+            opens: 'left',
+            locale: { format: 'DD/MM/YYYY' }
+        });
+
+        $('#followupDatePicker').on('apply.daterangepicker', function (ev, picker) {
+            var dateStr = picker.startDate.format('DD/MM/YYYY');
+            $('#followupDatePicker').val(dateStr);
+            SetQuickBtn('');
+            LoadFollowupsByDate(dateStr);
+        });
+
+        // ===== AUTO TAB FROM URL QUERY STRING =====
+        function getQueryParam(name) {
+            var reg = new RegExp('[?&]' + name + '=([^&#]*)');
+            var result = reg.exec(window.location.search);
+            return result ? decodeURIComponent(result[1]) : null;
+        }
+
+        var tab = getQueryParam('tab');
+
+        if (tab === 'enquiries') {
+            ShowTab('enquiries', document.getElementById('tabEnquiries'));
+        } else if (tab === 'followup') {
+            ShowTab('followup', document.getElementById('tabFollowup'));
+        } else if (tab === 'assignment') {
+            ShowTab('assignment', document.getElementById('tabAssignment'));
+        } else {
+            // Default: dashboard
+            LoadDashboard();
+            LoadEnquiries();
+            LoadFollowupBoard();
+        }
+    });
+</script>
